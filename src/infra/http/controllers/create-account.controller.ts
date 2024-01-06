@@ -1,6 +1,6 @@
+import { PrismaService } from '@/infra/database/prisma/prisma.service'
+import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation-pipe'
 import { Body, Controller, Post, UsePipes } from '@nestjs/common'
-import { ZodValidationPipe } from 'src/pipes/zod-validation-pipe'
-import { PrismaService } from 'src/prisma/prisma.service'
 import { z } from 'zod'
 
 const createAccountBodySchema = z.object({
@@ -9,7 +9,7 @@ const createAccountBodySchema = z.object({
   password: z.string(),
 })
 
-type createAccountBodySchema = z.infer<typeof createAccountBodySchema>
+type CreateAccountBodySchema = z.infer<typeof createAccountBodySchema>
 
 @Controller('/user')
 export class CreateAccountController {
@@ -17,7 +17,7 @@ export class CreateAccountController {
 
   @Post()
   @UsePipes(new ZodValidationPipe(createAccountBodySchema))
-  async handle(@Body() body: createAccountBodySchema) {
+  async handle(@Body() body: CreateAccountBodySchema) {
     const { name, cpf, password } = body
 
     await this.prismaService.user.create({
