@@ -31,8 +31,6 @@ describe('Authenticate (E2E)', () => {
       password: '123456',
     })
 
-    console.log(response)
-
     expect(response.statusCode).toBe(201)
   })
 })

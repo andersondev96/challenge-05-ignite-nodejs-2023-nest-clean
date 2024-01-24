@@ -1,6 +1,7 @@
 import { Either, left, right } from '@/core/either'
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
+import { Injectable } from '@nestjs/common'
 import { compare } from 'bcryptjs'
 import { User } from '../../enterprise/entities/User'
 import { UserRepository } from '../repositories/user-repository'
@@ -17,6 +18,7 @@ type AuthenticateUseCaseResponse = Either<
   }
 >
 
+@Injectable()
 export class AuthenticateUseCase {
   constructor(private usersRepository: UserRepository) {}
 

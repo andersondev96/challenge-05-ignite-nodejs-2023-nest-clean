@@ -1,5 +1,6 @@
 import { Either, left, right } from '@/core/either'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
+import { Injectable } from '@nestjs/common'
 import { hash } from 'bcryptjs'
 import { User } from '../../enterprise/entities/User'
 import { UserRepository } from '../repositories/user-repository'
@@ -18,6 +19,7 @@ type CreteUserUseCaseResponse = Either<
   }
 >
 
+@Injectable()
 export class CreateUserUseCase {
   constructor(private userRepository: UserRepository) {}
 
