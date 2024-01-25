@@ -5,7 +5,7 @@ export interface UserProps {
   name: string
   cpf: string
   password: string
-  type: 'deliveryman' | 'admin'
+  role: 'DELIVERYMAN' | 'ADMIN'
 }
 
 export class User extends Entity<UserProps> {
@@ -33,8 +33,8 @@ export class User extends Entity<UserProps> {
     this.props.password = password
   }
 
-  get type() {
-    return this.props.type
+  get role() {
+    return this.props.role
   }
 
   static create(props: UserProps, id?: UniqueEntityId) {

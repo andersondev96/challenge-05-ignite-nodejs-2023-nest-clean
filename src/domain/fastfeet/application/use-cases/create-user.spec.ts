@@ -1,15 +1,15 @@
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
 import { MakeUser } from 'test/factories/make-user'
 import { InMemoryUsersRepository } from 'test/repositories/in-memory-users-repository'
-import { CreateUserUseCase } from './create-user'
+import { CreateAccountUseCase } from './create-account'
 
 let inMemoryUsersRepository: InMemoryUsersRepository
-let sut: CreateUserUseCase
+let sut: CreateAccountUseCase
 
 describe('Create User', () => {
   beforeEach(() => {
     inMemoryUsersRepository = new InMemoryUsersRepository()
-    sut = new CreateUserUseCase(inMemoryUsersRepository)
+    sut = new CreateAccountUseCase(inMemoryUsersRepository)
   })
 
   it('should be able to create a new user', async () => {

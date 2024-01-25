@@ -1,15 +1,16 @@
 import { Either, left, right } from '@/core/either'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
 import { Injectable } from '@nestjs/common'
-import { hash } from 'bcryptjs'
 import { User } from '../../enterprise/entities/User'
-import { UserRepository } from '../repositories/user-repository'
+import { HashGenerator } from '../cryptography/hash-generator'
+import { UsersRepository } from '../repositories/users-repository'
+import { UserAlreadyExistsError } from './errors/UserAlreadyExistsError'
 
-interface CreateUserUseCaseRequest {
+interface CreateAccountUseCaseRequest {
   name: string
   cpf: string
   password: string
-  type: 'admin' | 'deliveryman'
+  role: 'ADMIN' | 'DELIVERYMAN'
 }
 
 type CreteUserUseCaseResponse = Either<
@@ -20,28 +21,31 @@ type CreteUserUseCaseResponse = Either<
 >
 
 @Injectable()
-export class CreateUserUseCase {
-  constructor(private userRepository: UserRepository) {}
+export class CreateAccountUseCase {
+  constructor(
+    private userRepository: UsersRepository,
+    private hashGenerator: HashGenerator,
+  ) {}
 
   async execute({
     name,
     cpf,
     password,
-    type,
-  }: CreateUserUseCaseRequest): Promise<CreteUserUseCaseResponse> {
+    role,
+  }: CreateAccountUseCaseRequest): Promise<CreteUserUseCaseResponse> {
     const userAlreadyExists = await this.userRepository.findByCPF(cpf)
 
     if (userAlreadyExists) {
-      return left(new ResourceNotFoundError())
+      return left(new UserAlreadyExistsError(cpf))
     }
 
-    const passwordHashed = await hash(password, 6)
+    const passwordHashed = await this.hashGenerator.hash(password)
 
     const user = User.create({
       name,
       cpf,
       password: passwordHashed,
-      type,
+      role,
     })
 
     await this.userRepository.create(user)
