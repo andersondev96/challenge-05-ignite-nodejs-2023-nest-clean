@@ -1,36 +1,42 @@
+import { DatabaseModule } from '@/infra/database/database.module'
 import { INestApplication } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { hash } from 'bcryptjs'
 import { AppModule } from 'src/infra/app.module'
 import request from 'supertest'
+import { UserFactory } from 'test/factories/make-user'
 
 describe('Authenticate (E2E)', () => {
   let app: INestApplication
+  let userFactory: UserFactory
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [AppModule, DatabaseModule],
+      providers: [UserFactory],
     }).compile()
 
     app = moduleRef.createNestApplication()
+
+    userFactory = moduleRef.get(UserFactory)
 
     await app.init()
   })
 
   test('[POST] / sessions', async () => {
-    await request(app.getHttpServer())
-      .post('/user')
-      .send({
-        name: 'John Doe',
-        cpf: '123456',
-        password: await hash('123456', 8),
-      })
+    await userFactory.makePrismaUser({
+      cpf: '12345678',
+      password: await hash('12345678', 8),
+    })
 
     const response = await request(app.getHttpServer()).post('/sessions').send({
-      cpf: '123456',
-      password: '123456',
+      cpf: '12345678',
+      password: '12345678',
     })
 
     expect(response.statusCode).toBe(201)
+    expect(response.body).toEqual({
+      access_token: expect.any(String),
+    })
   })
 })

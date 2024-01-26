@@ -4,6 +4,7 @@ import { UniqueEntityId } from '@/core/entities/unique-entity-id'
 export interface RecipientProps {
   name: string
   address: string
+  userId: UniqueEntityId
 }
 
 export class Recipient extends Entity<RecipientProps> {
@@ -21,6 +22,14 @@ export class Recipient extends Entity<RecipientProps> {
 
   set address(address: string) {
     this.props.address = address
+  }
+
+  get userId() {
+    return this.props.userId
+  }
+
+  set userId(userId: UniqueEntityId) {
+    this.props.userId = userId
   }
 
   static create(props: RecipientProps, id?: UniqueEntityId) {

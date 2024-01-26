@@ -1,10 +1,11 @@
 import { Either, left, right } from '@/core/either'
+import { UniqueEntityId } from '@/core/entities/unique-entity-id'
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
 import { Injectable } from '@nestjs/common'
 import { Recipient } from '../../enterprise/entities/Recipient'
-import { RecipientRepository } from '../repositories/recipient-repository'
-import { UserRepository } from '../repositories/user-repository'
+import { RecipientsRepository } from '../repositories/recipients-repository'
+import { UsersRepository } from '../repositories/users-repository'
 
 interface CreateRecipientUseCaseRequest {
   userId: string
@@ -22,8 +23,8 @@ type CreateRecipientUseCaseResponse = Either<
 @Injectable()
 export class CreateRecipientUseCase {
   constructor(
-    private usersRepository: UserRepository,
-    private recipientRepository: RecipientRepository,
+    private usersRepository: UsersRepository,
+    private recipientsRepository: RecipientsRepository,
   ) {}
 
   async execute({
@@ -37,16 +38,17 @@ export class CreateRecipientUseCase {
       return left(new ResourceNotFoundError())
     }
 
-    if (user.type !== 'admin') {
+    if (user.role !== 'ADMIN') {
       return left(new NotAllowedError())
     }
 
     const recipient = Recipient.create({
       name,
       address,
+      userId: new UniqueEntityId(userId),
     })
 
-    await this.recipientRepository.create(recipient)
+    await this.recipientsRepository.create(recipient)
 
     return right({
       recipient,

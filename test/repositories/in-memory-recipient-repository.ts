@@ -1,7 +1,7 @@
-import { RecipientRepository } from '@/domain/fastfeet/application/repositories/recipient-repository'
+import { RecipientsRepository } from '@/domain/fastfeet/application/repositories/recipients-repository'
 import { Recipient } from '@/domain/fastfeet/enterprise/entities/Recipient'
 
-export class InMemoryRecipientRepository implements RecipientRepository {
+export class InMemoryRecipientRepository implements RecipientsRepository {
   public items: Recipient[] = []
 
   async findById(id: string) {

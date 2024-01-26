@@ -1,8 +1,8 @@
+import { CreateRecipientUseCase } from '@/domain/fastfeet/application/use-cases/create-recipient'
 import { CurrentUser } from '@/infra/auth/current-user-decorator'
 import { UserPayload } from '@/infra/auth/jwt.strategy'
-import { PrismaService } from '@/infra/database/prisma/prisma.service'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation-pipe'
-import { Body, Controller, Post, UsePipes } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Post } from '@nestjs/common'
 import { z } from 'zod'
 
 const createRecipientBodySchema = z.object({
@@ -10,27 +10,30 @@ const createRecipientBodySchema = z.object({
   address: z.string(),
 })
 
-type CreateRecipientBodySchema = z.infer<typeof createRecipientBodySchema>
+const bodyValidationPipe = new ZodValidationPipe(createRecipientBodySchema)
 
-@Controller('/recipient')
+type createRecipientBodySchema = z.infer<typeof createRecipientBodySchema>
+
+@Controller('/recipients')
 export class CreateRecipientController {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private createRecipient: CreateRecipientUseCase) {}
 
   @Post()
-  @UsePipes(new ZodValidationPipe(createRecipientBodySchema))
   async handle(
-    @Body() body: CreateRecipientBodySchema,
+    @Body(bodyValidationPipe) body: createRecipientBodySchema,
     @CurrentUser() user: UserPayload,
   ) {
     const { name, address } = body
     const userId = user.sub
 
-    await this.prismaService.recipient.create({
-      data: {
-        userId,
-        name,
-        address,
-      },
+    const result = await this.createRecipient.execute({
+      userId,
+      name,
+      address,
     })
+
+    if (result.isLeft()) {
+      throw new BadRequestException()
+    }
   }
 }

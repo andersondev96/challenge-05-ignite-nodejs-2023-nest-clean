@@ -20,8 +20,8 @@ describe('Create Account (E2E)', () => {
     await app.init()
   })
 
-  test('[POST] / user', async () => {
-    const response = await request(app.getHttpServer()).post('/user').send({
+  test('[POST] / account', async () => {
+    const response = await request(app.getHttpServer()).post('/account').send({
       name: 'John Doe',
       cpf: '123456',
       password: '123456',

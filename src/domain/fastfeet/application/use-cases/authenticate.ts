@@ -1,10 +1,9 @@
 import { Either, left, right } from '@/core/either'
-import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
-import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
 import { Injectable } from '@nestjs/common'
-import { compare } from 'bcryptjs'
-import { User } from '../../enterprise/entities/User'
-import { UserRepository } from '../repositories/user-repository'
+import { Encrypter } from '../cryptography/encrypter'
+import { HashComparer } from '../cryptography/hash-comparer'
+import { UsersRepository } from '../repositories/users-repository'
+import { WrongCredentialsError } from './errors/WrongCredentialsError'
 
 interface AuthenticateUseCaseRequest {
   cpf: string
@@ -12,15 +11,19 @@ interface AuthenticateUseCaseRequest {
 }
 
 type AuthenticateUseCaseResponse = Either<
-  ResourceNotFoundError | NotAllowedError,
+  WrongCredentialsError,
   {
-    user: User
+    accessToken: string
   }
 >
 
 @Injectable()
 export class AuthenticateUseCase {
-  constructor(private usersRepository: UserRepository) {}
+  constructor(
+    private usersRepository: UsersRepository,
+    private hashComparer: HashComparer,
+    private encrypter: Encrypter,
+  ) {}
 
   async execute({
     cpf,
@@ -29,17 +32,24 @@ export class AuthenticateUseCase {
     const user = await this.usersRepository.findByCPF(cpf)
 
     if (!user) {
-      return left(new ResourceNotFoundError())
+      return left(new WrongCredentialsError())
     }
 
-    const verifyPassword = await compare(password, user.password)
+    const verifyPassword = await this.hashComparer.compare(
+      password,
+      user.password,
+    )
 
     if (!verifyPassword) {
-      return left(new NotAllowedError())
+      return left(new WrongCredentialsError())
     }
 
+    const accessToken = await this.encrypter.encrypt({
+      sub: user.id.toString(),
+    })
+
     return right({
-      user,
+      accessToken,
     })
   }
 }

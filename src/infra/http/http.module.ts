@@ -1,4 +1,6 @@
+import { AuthenticateUseCase } from '@/domain/fastfeet/application/use-cases/authenticate'
 import { CreateAccountUseCase } from '@/domain/fastfeet/application/use-cases/create-account'
+import { CreateRecipientUseCase } from '@/domain/fastfeet/application/use-cases/create-recipient'
 import { Module } from '@nestjs/common'
 import { CryptographyModule } from '../cryptography/cryptography.module'
 import { DatabaseModule } from '../database/database.module'
@@ -13,6 +15,10 @@ import { CreateRecipientController } from './controllers/create-recipient.contro
     AuthenticateController,
     CreateRecipientController,
   ],
-  providers: [CreateAccountUseCase],
+  providers: [
+    CreateAccountUseCase,
+    AuthenticateUseCase,
+    CreateRecipientUseCase,
+  ],
 })
 export class HttpModule {}

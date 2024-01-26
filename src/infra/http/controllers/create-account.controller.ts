@@ -1,5 +1,6 @@
 import { CreateAccountUseCase } from '@/domain/fastfeet/application/use-cases/create-account'
 import { UserAlreadyExistsError } from '@/domain/fastfeet/application/use-cases/errors/UserAlreadyExistsError'
+import { Public } from '@/infra/auth/public'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation-pipe'
 import {
   BadRequestException,
@@ -21,7 +22,8 @@ const createAccountBodySchema = z.object({
 
 type CreateAccountBodySchema = z.infer<typeof createAccountBodySchema>
 
-@Controller('/user')
+@Controller('/account')
+@Public()
 export class CreateAccountController {
   constructor(private createAccountUseCase: CreateAccountUseCase) {}
 
