@@ -2,8 +2,8 @@ import { Either, left, right } from '@/core/either'
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
 import { Recipient } from '../../enterprise/entities/Recipient'
-import { RecipientRepository } from '../repositories/recipient-repository'
-import { UserRepository } from '../repositories/user-repository'
+import { RecipientsRepository } from '../repositories/recipients-repository'
+import { UsersRepository } from '../repositories/users-repository'
 
 interface UpdateRecipientUseCaseRequest {
   userId: string
@@ -21,8 +21,8 @@ type CreteUserUseCaseResponse = Either<
 
 export class UpdateRecipientUseCase {
   constructor(
-    private userRepository: UserRepository,
-    private recipientRepository: RecipientRepository,
+    private userRepository: UsersRepository,
+    private recipientRepository: RecipientsRepository,
   ) {}
 
   async execute({
@@ -37,7 +37,7 @@ export class UpdateRecipientUseCase {
       return left(new ResourceNotFoundError())
     }
 
-    if (user.type !== 'admin') {
+    if (user.role !== 'ADMIN') {
       return left(new NotAllowedError())
     }
 

@@ -1,9 +1,10 @@
 import { Either, left, right } from '@/core/either'
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
-import { compare, hash } from 'bcryptjs'
 import { User } from '../../enterprise/entities/User'
-import { UserRepository } from '../repositories/user-repository'
+import { HashComparer } from '../cryptography/hash-comparer'
+import { HashGenerator } from '../cryptography/hash-generator'
+import { UsersRepository } from '../repositories/users-repository'
 
 interface ResetPasswordUseCaseRequest {
   userId: string
@@ -20,7 +21,11 @@ type ResetPasswordUseCaseResponse = Either<
 >
 
 export class ResetPasswordUseCase {
-  constructor(private userRepository: UserRepository) {}
+  constructor(
+    private userRepository: UsersRepository,
+    private hashGenerator: HashGenerator,
+    private hashComparer: HashComparer,
+  ) {}
 
   async execute({
     userId,
@@ -34,7 +39,7 @@ export class ResetPasswordUseCase {
       return left(new ResourceNotFoundError())
     }
 
-    if (user.type !== 'admin') {
+    if (user.role !== 'ADMIN') {
       return left(new NotAllowedError())
     }
 
@@ -44,13 +49,16 @@ export class ResetPasswordUseCase {
       return left(new ResourceNotFoundError())
     }
 
-    const verifyPassword = await compare(oldPassword, user.password)
+    const verifyPassword = await this.hashComparer.compare(
+      oldPassword,
+      user.password,
+    )
 
     if (!verifyPassword) {
       return left(new NotAllowedError())
     }
 
-    const hashPassword = await hash(newPassword, 6)
+    const hashPassword = await this.hashGenerator.hash(newPassword)
 
     findUser.password = hashPassword
 

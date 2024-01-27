@@ -1,7 +1,7 @@
-import { UserRepository } from '@/domain/fastfeet/application/repositories/user-repository'
+import { UsersRepository } from '@/domain/fastfeet/application/repositories/users-repository'
 import { User } from '@/domain/fastfeet/enterprise/entities/User'
 
-export class InMemoryUsersRepository implements UserRepository {
+export class InMemoryUsersRepository implements UsersRepository {
   public items: User[] = []
 
   async findById(id: string): Promise<User | null> {

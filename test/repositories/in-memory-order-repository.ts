@@ -1,9 +1,9 @@
 import { DomainEvents } from '@/core/events/domain-events'
 import { PaginationParams } from '@/core/repositories/pagination-params'
-import { OrderRepository } from '@/domain/fastfeet/application/repositories/order-repository'
+import { OrdersRepository } from '@/domain/fastfeet/application/repositories/orders-repository'
 import { Order } from '@/domain/fastfeet/enterprise/entities/Order'
 
-export class InMemoryOrderRepository implements OrderRepository {
+export class InMemoryOrderRepository implements OrdersRepository {
   public items: Order[] = []
 
   async findById(id: string) {

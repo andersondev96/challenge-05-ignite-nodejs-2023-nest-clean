@@ -38,7 +38,7 @@ describe('On Status Order Updated', () => {
 
   it('should send a notification when an order status is updated', async () => {
     const createUser = await MakeUser({
-      type: 'admin',
+      role: 'ADMIN',
     })
 
     const createRecipient = await MakeRecipient()

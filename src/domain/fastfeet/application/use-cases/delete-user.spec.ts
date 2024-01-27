@@ -3,25 +3,25 @@ import { MakeUser } from 'test/factories/make-user'
 import { InMemoryUsersRepository } from 'test/repositories/in-memory-users-repository'
 import { DeleteUserUseCase } from './delete-user'
 
-let usersRepository: InMemoryUsersRepository
+let inMemoryUsersRepository: InMemoryUsersRepository
 let sut: DeleteUserUseCase
 
 describe('Delete User', () => {
   beforeEach(() => {
-    usersRepository = new InMemoryUsersRepository()
-    sut = new DeleteUserUseCase(usersRepository)
+    inMemoryUsersRepository = new InMemoryUsersRepository()
+    sut = new DeleteUserUseCase(inMemoryUsersRepository)
   })
 
   it('should be able to delete an user', async () => {
     const createUser = await MakeUser()
 
-    usersRepository.create(createUser)
+    inMemoryUsersRepository.create(createUser)
 
     await sut.execute({
       userId: createUser.id.toString(),
     })
 
-    expect(usersRepository.items).toHaveLength(0)
+    expect(inMemoryUsersRepository.items).toHaveLength(0)
   })
 
   it('should not be able to delete an inexistent user', async () => {

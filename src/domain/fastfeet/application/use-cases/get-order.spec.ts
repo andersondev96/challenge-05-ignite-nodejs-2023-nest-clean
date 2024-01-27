@@ -6,26 +6,26 @@ import { InMemoryOrderRepository } from 'test/repositories/in-memory-order-repos
 import { InMemoryUsersRepository } from 'test/repositories/in-memory-users-repository'
 import { GetOrderUseCase } from './get-order'
 
-let userRepository: InMemoryUsersRepository
-let orderRepository: InMemoryOrderRepository
+let inMemoryUsersRepository: InMemoryUsersRepository
+let inMemoryOrderRepository: InMemoryOrderRepository
 let sut: GetOrderUseCase
 
 describe('Get Order', () => {
   beforeEach(() => {
-    userRepository = new InMemoryUsersRepository()
-    orderRepository = new InMemoryOrderRepository()
-    sut = new GetOrderUseCase(userRepository, orderRepository)
+    inMemoryUsersRepository = new InMemoryUsersRepository()
+    inMemoryOrderRepository = new InMemoryOrderRepository()
+    sut = new GetOrderUseCase(inMemoryUsersRepository, inMemoryOrderRepository)
   })
 
   it('should be able to get order', async () => {
     const createUser = await MakeUser({
-      type: 'admin',
+      role: 'ADMIN',
     })
 
     const createOrder = await MakeOrder()
 
-    await userRepository.create(createUser)
-    await orderRepository.create(createOrder)
+    await inMemoryUsersRepository.create(createUser)
+    await inMemoryOrderRepository.create(createOrder)
 
     const result = await sut.execute({
       userId: createUser.id.toString(),
@@ -33,12 +33,12 @@ describe('Get Order', () => {
     })
 
     expect(result.isRight()).toBe(true)
-    expect(orderRepository.items).toHaveLength(1)
+    expect(inMemoryOrderRepository.items).toHaveLength(1)
   })
 
   it('should not be able to get order if user not found', async () => {
     const createOrder = await MakeOrder()
-    await orderRepository.create(createOrder)
+    await inMemoryOrderRepository.create(createOrder)
 
     const result = await sut.execute({
       userId: '123456',
@@ -51,12 +51,12 @@ describe('Get Order', () => {
 
   it('should not be able to  create a new order if user not is admin', async () => {
     const createUser = await MakeUser({
-      type: 'deliveryman',
+      role: 'DELIVERYMAN',
     })
     const createOrder = await MakeOrder()
 
-    await userRepository.create(createUser)
-    await orderRepository.create(createOrder)
+    await inMemoryUsersRepository.create(createUser)
+    await inMemoryOrderRepository.create(createOrder)
 
     const result = await sut.execute({
       userId: createUser.id.toString(),

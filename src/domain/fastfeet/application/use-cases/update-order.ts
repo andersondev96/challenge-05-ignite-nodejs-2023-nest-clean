@@ -2,9 +2,9 @@ import { Either, left, right } from '@/core/either'
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
 import { Order, StatusOrder } from '../../enterprise/entities/Order'
-import { OrderRepository } from '../repositories/order-repository'
-import { RecipientRepository } from '../repositories/recipient-repository'
-import { UserRepository } from '../repositories/user-repository'
+import { OrdersRepository } from '../repositories/orders-repository'
+import { RecipientsRepository } from '../repositories/recipients-repository'
+import { UsersRepository } from '../repositories/users-repository'
 
 interface UpdateOrderUseCaseRequest {
   deliverymanId: string
@@ -25,9 +25,9 @@ type UpdateOrderUseCaseResponse = Either<
 
 export class UpdateOrderUseCase {
   constructor(
-    private userRepository: UserRepository,
-    private recipientRepository: RecipientRepository,
-    private orderRepository: OrderRepository,
+    private userRepository: UsersRepository,
+    private recipientRepository: RecipientsRepository,
+    private orderRepository: OrdersRepository,
   ) {}
 
   async execute({
@@ -45,7 +45,7 @@ export class UpdateOrderUseCase {
       return left(new ResourceNotFoundError())
     }
 
-    if (deliveryman.type !== 'admin') {
+    if (deliveryman.role !== 'ADMIN') {
       return left(new NotAllowedError())
     }
 

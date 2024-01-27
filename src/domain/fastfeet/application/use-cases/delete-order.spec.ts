@@ -8,20 +8,23 @@ import { InMemoryOrderRepository } from 'test/repositories/in-memory-order-repos
 import { InMemoryUsersRepository } from 'test/repositories/in-memory-users-repository'
 import { DeleteOrderUseCase } from './delete-order'
 
-let usersRepository: InMemoryUsersRepository
-let orderRepository: InMemoryOrderRepository
+let inMemoryUsersRepository: InMemoryUsersRepository
+let inMemoryOrderRepository: InMemoryOrderRepository
 let sut: DeleteOrderUseCase
 
 describe('Delete Order', () => {
   beforeEach(() => {
-    usersRepository = new InMemoryUsersRepository()
-    orderRepository = new InMemoryOrderRepository()
-    sut = new DeleteOrderUseCase(usersRepository, orderRepository)
+    inMemoryUsersRepository = new InMemoryUsersRepository()
+    inMemoryOrderRepository = new InMemoryOrderRepository()
+    sut = new DeleteOrderUseCase(
+      inMemoryUsersRepository,
+      inMemoryOrderRepository,
+    )
   })
 
   it('should be able to delete order', async () => {
     const createUser = await MakeUser({
-      type: 'admin',
+      role: 'ADMIN',
     })
     const createRecipient = await MakeRecipient()
 
@@ -30,15 +33,15 @@ describe('Delete Order', () => {
       recipientId: new UniqueEntityId(createRecipient.id.toString()),
     })
 
-    usersRepository.create(createUser)
-    orderRepository.create(createOrder)
+    inMemoryUsersRepository.create(createUser)
+    inMemoryOrderRepository.create(createOrder)
 
     await sut.execute({
       userId: createUser.id.toString(),
       orderId: createOrder.id.toString(),
     })
 
-    expect(orderRepository.items).toHaveLength(0)
+    expect(inMemoryOrderRepository.items).toHaveLength(0)
   })
 
   it('should not be able to delete order if user not found', async () => {
@@ -53,10 +56,10 @@ describe('Delete Order', () => {
 
   it('should not be able to delete order if user not is admin', async () => {
     const createUser = await MakeUser({
-      type: 'deliveryman',
+      role: 'DELIVERYMAN',
     })
 
-    usersRepository.create(createUser)
+    inMemoryUsersRepository.create(createUser)
 
     const result = await sut.execute({
       userId: createUser.id.toString(),
@@ -69,10 +72,10 @@ describe('Delete Order', () => {
 
   it('should not be able to delete order not found', async () => {
     const createUser = await MakeUser({
-      type: 'admin',
+      role: 'ADMIN',
     })
 
-    usersRepository.create(createUser)
+    inMemoryUsersRepository.create(createUser)
 
     const result = await sut.execute({
       userId: createUser.id.toString(),

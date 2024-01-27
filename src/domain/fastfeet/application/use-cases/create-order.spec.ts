@@ -7,32 +7,32 @@ import { InMemoryRecipientRepository } from 'test/repositories/in-memory-recipie
 import { InMemoryUsersRepository } from 'test/repositories/in-memory-users-repository'
 import { CreateOrderUseCase } from './create-order'
 
-let userRepository: InMemoryUsersRepository
-let recipientRepository: InMemoryRecipientRepository
-let orderRepository: InMemoryOrderRepository
+let inMemoryUsersRepository: InMemoryUsersRepository
+let inMemoryRecipientRepository: InMemoryRecipientRepository
+let inMemoryOrdersRepository: InMemoryOrderRepository
 let sut: CreateOrderUseCase
 
 describe('Create Order', () => {
   beforeEach(() => {
-    userRepository = new InMemoryUsersRepository()
-    recipientRepository = new InMemoryRecipientRepository()
-    orderRepository = new InMemoryOrderRepository()
+    inMemoryUsersRepository = new InMemoryUsersRepository()
+    inMemoryRecipientRepository = new InMemoryRecipientRepository()
+    inMemoryOrdersRepository = new InMemoryOrderRepository()
     sut = new CreateOrderUseCase(
-      userRepository,
-      recipientRepository,
-      orderRepository,
+      inMemoryUsersRepository,
+      inMemoryRecipientRepository,
+      inMemoryOrdersRepository,
     )
   })
 
   it('should be able to create a new order', async () => {
     const createUser = await MakeUser({
-      type: 'admin',
+      role: 'ADMIN',
     })
 
     const createRecipient = await MakeRecipient()
 
-    await userRepository.create(createUser)
-    await recipientRepository.create(createRecipient)
+    await inMemoryUsersRepository.create(createUser)
+    await inMemoryRecipientRepository.create(createRecipient)
 
     const result = await sut.execute({
       deliverymanId: createUser.id.toString(),
@@ -47,7 +47,7 @@ describe('Create Order', () => {
   it('should not be able to  create a new order if deliveryman not found', async () => {
     const createRecipient = await MakeRecipient()
 
-    await recipientRepository.create(createRecipient)
+    await inMemoryRecipientRepository.create(createRecipient)
 
     const result = await sut.execute({
       deliverymanId: '123456',
@@ -62,14 +62,14 @@ describe('Create Order', () => {
 
   it('should not be able to  create a new order if user not is admin', async () => {
     const createUser = await MakeUser({
-      type: 'deliveryman',
+      role: 'DELIVERYMAN',
     })
 
-    await userRepository.create(createUser)
+    await inMemoryUsersRepository.create(createUser)
 
     const createRecipient = await MakeRecipient()
 
-    await recipientRepository.create(createRecipient)
+    await inMemoryRecipientRepository.create(createRecipient)
 
     const result = await sut.execute({
       deliverymanId: createUser.id.toString(),
@@ -84,10 +84,10 @@ describe('Create Order', () => {
 
   it('should not be able to  create a new order if recipient not found', async () => {
     const createUser = await MakeUser({
-      type: 'admin',
+      role: 'ADMIN',
     })
 
-    await userRepository.create(createUser)
+    await inMemoryUsersRepository.create(createUser)
 
     const result = await sut.execute({
       deliverymanId: '123456',

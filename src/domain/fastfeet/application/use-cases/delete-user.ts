@@ -1,6 +1,6 @@
 import { Either, left, right } from '@/core/either'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
-import { UserRepository } from '../repositories/user-repository'
+import { UsersRepository } from '../repositories/users-repository'
 
 interface DeleteUserUseCaseRequest {
   userId: string
@@ -9,7 +9,7 @@ interface DeleteUserUseCaseRequest {
 type CreteUserUseCaseResponse = Either<ResourceNotFoundError, null>
 
 export class DeleteUserUseCase {
-  constructor(private userRepository: UserRepository) {}
+  constructor(private userRepository: UsersRepository) {}
 
   async execute({
     userId,

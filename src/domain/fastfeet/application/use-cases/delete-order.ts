@@ -2,8 +2,8 @@ import { Either, left, right } from '@/core/either'
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
 import { Order } from '../../enterprise/entities/Order'
-import { OrderRepository } from '../repositories/order-repository'
-import { UserRepository } from '../repositories/user-repository'
+import { OrdersRepository } from '../repositories/orders-repository'
+import { UsersRepository } from '../repositories/users-repository'
 
 interface DeleteOrderUseCaseRequest {
   userId: string
@@ -19,31 +19,31 @@ type DeleteOrderUseCaseResponse = Either<
 
 export class DeleteOrderUseCase {
   constructor(
-    private userRepository: UserRepository,
-    private orderRepository: OrderRepository,
+    private usersRepository: UsersRepository,
+    private ordersRepository: OrdersRepository,
   ) {}
 
   async execute({
     userId,
     orderId,
   }: DeleteOrderUseCaseRequest): Promise<DeleteOrderUseCaseResponse> {
-    const user = await this.userRepository.findById(userId)
+    const user = await this.usersRepository.findById(userId)
 
     if (!user) {
       return left(new ResourceNotFoundError())
     }
 
-    if (user.type !== 'admin') {
+    if (user.role !== 'ADMIN') {
       return left(new NotAllowedError())
     }
 
-    const order = await this.orderRepository.findById(orderId)
+    const order = await this.ordersRepository.findById(orderId)
 
     if (!order) {
       return left(new ResourceNotFoundError())
     }
 
-    await this.orderRepository.delete(order)
+    await this.ordersRepository.delete(order)
 
     return right({
       order,

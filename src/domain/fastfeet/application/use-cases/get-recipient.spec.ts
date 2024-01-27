@@ -6,25 +6,28 @@ import { InMemoryRecipientRepository } from 'test/repositories/in-memory-recipie
 import { InMemoryUsersRepository } from 'test/repositories/in-memory-users-repository'
 import { GetRecipientUseCase } from './get-recipient'
 
-let usersRepository: InMemoryUsersRepository
-let recipientsRepository: InMemoryRecipientRepository
+let inMemoryUsersRepository: InMemoryUsersRepository
+let inMemoryRecipientsRepository: InMemoryRecipientRepository
 let sut: GetRecipientUseCase
 
 describe('Update Recipient', () => {
   beforeEach(() => {
-    usersRepository = new InMemoryUsersRepository()
-    recipientsRepository = new InMemoryRecipientRepository()
-    sut = new GetRecipientUseCase(usersRepository, recipientsRepository)
+    inMemoryUsersRepository = new InMemoryUsersRepository()
+    inMemoryRecipientsRepository = new InMemoryRecipientRepository()
+    sut = new GetRecipientUseCase(
+      inMemoryUsersRepository,
+      inMemoryRecipientsRepository,
+    )
   })
 
   it('should be able to update recipient', async () => {
     const createUser = await MakeUser({
-      type: 'admin',
+      role: 'ADMIN',
     })
     const createRecipient = await MakeRecipient()
 
-    usersRepository.create(createUser)
-    recipientsRepository.create(createRecipient)
+    inMemoryUsersRepository.create(createUser)
+    inMemoryRecipientsRepository.create(createRecipient)
 
     const result = await sut.execute({
       userId: createUser.id.toString(),
@@ -32,7 +35,7 @@ describe('Update Recipient', () => {
     })
 
     expect(result.isRight()).toBe(true)
-    expect(recipientsRepository.items).toHaveLength(1)
+    expect(inMemoryRecipientsRepository.items).toHaveLength(1)
   })
 
   it('should not be able to update recipient if user not found', async () => {
@@ -47,10 +50,10 @@ describe('Update Recipient', () => {
 
   it('should not be able to update recipient if user not is admin', async () => {
     const createUser = await MakeUser({
-      type: 'deliveryman',
+      role: 'DELIVERYMAN',
     })
 
-    usersRepository.create(createUser)
+    inMemoryUsersRepository.create(createUser)
 
     const result = await sut.execute({
       userId: createUser.id.toString(),
@@ -63,10 +66,10 @@ describe('Update Recipient', () => {
 
   it('should not be able to update recipient not found', async () => {
     const createUser = await MakeUser({
-      type: 'admin',
+      role: 'ADMIN',
     })
 
-    usersRepository.create(createUser)
+    inMemoryUsersRepository.create(createUser)
 
     const result = await sut.execute({
       userId: createUser.id.toString(),

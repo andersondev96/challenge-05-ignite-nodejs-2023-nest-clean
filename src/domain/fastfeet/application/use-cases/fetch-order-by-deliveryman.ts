@@ -1,6 +1,6 @@
 import { Either, right } from '@/core/either'
 import { Order } from '../../enterprise/entities/Order'
-import { OrderRepository } from '../repositories/order-repository'
+import { OrdersRepository } from '../repositories/orders-repository'
 
 interface FetchOrderByDeliverymanUseCaseRequest {
   userId: string
@@ -15,7 +15,7 @@ type FetchOrderByDeliverymanUseCaseResponse = Either<
 >
 
 export class FetchOrderByDeliverymanUseCase {
-  constructor(private orderRepository: OrderRepository) {}
+  constructor(private orderRepository: OrdersRepository) {}
 
   async execute({
     userId,

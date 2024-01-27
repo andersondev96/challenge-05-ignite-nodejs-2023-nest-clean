@@ -1,8 +1,8 @@
 import { Either, left, right } from '@/core/either'
-import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
-import { hash } from 'bcryptjs'
 import { User } from '../../enterprise/entities/User'
-import { UserRepository } from '../repositories/user-repository'
+import { HashGenerator } from '../cryptography/hash-generator'
+import { UsersRepository } from '../repositories/users-repository'
+import { UserNotFoundError } from './errors/UserNotFoundError'
 
 interface UpdateUserUseCaseRequest {
   userId: string
@@ -12,14 +12,17 @@ interface UpdateUserUseCaseRequest {
 }
 
 type UpdateUserUseCaseResponse = Either<
-  ResourceNotFoundError,
+  UserNotFoundError,
   {
     user: User
   }
 >
 
 export class UpdateUserUseCase {
-  constructor(private userRepository: UserRepository) {}
+  constructor(
+    private usersRepository: UsersRepository,
+    private hashGenerator: HashGenerator,
+  ) {}
 
   async execute({
     userId,
@@ -27,19 +30,19 @@ export class UpdateUserUseCase {
     cpf,
     password,
   }: UpdateUserUseCaseRequest): Promise<UpdateUserUseCaseResponse> {
-    const user = await this.userRepository.findById(userId)
+    const user = await this.usersRepository.findById(userId)
 
     if (!user) {
-      return left(new ResourceNotFoundError())
+      return left(new UserNotFoundError())
     }
 
-    const hashPassword = await hash(password, 6)
+    const hashPassword = await this.hashGenerator.hash(password)
 
     user.name = name
     user.cpf = cpf
     user.password = hashPassword
 
-    await this.userRepository.save(user)
+    await this.usersRepository.save(user)
 
     return right({
       user,

@@ -1,12 +1,12 @@
 import { DomainEvents } from '@/core/events/domain-events'
 import { EventHandler } from '@/core/events/event-handler'
-import { OrderRepository } from '@/domain/fastfeet/application/repositories/order-repository'
+import { OrdersRepository } from '@/domain/fastfeet/application/repositories/orders-repository'
 import { StatusOrderUpdatedEvent } from '@/domain/fastfeet/enterprise/events/status-order-updated-event'
 import { SendNotificationUseCase } from '../use-cases/send-notification'
 
 export class OnStatusOrderUpdated implements EventHandler {
   constructor(
-    private orderRepository: OrderRepository,
+    private orderRepository: OrdersRepository,
     private sendNotification: SendNotificationUseCase,
   ) {
     this.setupSubscriptions()
@@ -24,7 +24,7 @@ export class OnStatusOrderUpdated implements EventHandler {
 
     if (findOrder) {
       await this.sendNotification.execute({
-        recipientId: order.recipientId,
+        recipientId: order.recipientId.toString(),
         title: `Atualização do status de sua encomenda para ${order.status}`,
         content: order.product,
       })

@@ -10,22 +10,25 @@ import { InMemoryUsersRepository } from 'test/repositories/in-memory-users-repos
 import { StatusOrder } from '../../enterprise/entities/Order'
 import { PlaceOrderUseCase } from './place-order'
 
-let userRepository: InMemoryUsersRepository
-let recipientRepository: InMemoryRecipientRepository
-let orderRepository: InMemoryOrderRepository
+let inMemoryUsersRepository: InMemoryUsersRepository
+let inMemoryRecipientsRepository: InMemoryRecipientRepository
+let inMemoryOrderRepository: InMemoryOrderRepository
 let sut: PlaceOrderUseCase
 
 describe('Place Order', () => {
   beforeEach(() => {
-    userRepository = new InMemoryUsersRepository()
-    recipientRepository = new InMemoryRecipientRepository()
-    orderRepository = new InMemoryOrderRepository()
-    sut = new PlaceOrderUseCase(userRepository, orderRepository)
+    inMemoryUsersRepository = new InMemoryUsersRepository()
+    inMemoryRecipientsRepository = new InMemoryRecipientRepository()
+    inMemoryOrderRepository = new InMemoryOrderRepository()
+    sut = new PlaceOrderUseCase(
+      inMemoryUsersRepository,
+      inMemoryOrderRepository,
+    )
   })
 
   it('should be able to place order to delivered', async () => {
     const createUser = await MakeUser({
-      type: 'admin',
+      role: 'ADMIN',
     })
 
     const createRecipient = await MakeRecipient()
@@ -35,9 +38,9 @@ describe('Place Order', () => {
       recipientId: new UniqueEntityId(createRecipient.id.toString()),
     })
 
-    await userRepository.create(createUser)
-    await recipientRepository.create(createRecipient)
-    await orderRepository.create(createOrder)
+    await inMemoryUsersRepository.create(createUser)
+    await inMemoryRecipientsRepository.create(createRecipient)
+    await inMemoryOrderRepository.create(createOrder)
 
     const result = await sut.execute({
       userId: createUser.id.toString(),
@@ -51,7 +54,7 @@ describe('Place Order', () => {
 
   it('should be able to place order to waiting', async () => {
     const createUser = await MakeUser({
-      type: 'admin',
+      role: 'ADMIN',
     })
 
     const createRecipient = await MakeRecipient()
@@ -61,9 +64,9 @@ describe('Place Order', () => {
       recipientId: new UniqueEntityId(createRecipient.id.toString()),
     })
 
-    await userRepository.create(createUser)
-    await recipientRepository.create(createRecipient)
-    await orderRepository.create(createOrder)
+    await inMemoryUsersRepository.create(createUser)
+    await inMemoryRecipientsRepository.create(createRecipient)
+    await inMemoryOrderRepository.create(createOrder)
 
     const result = await sut.execute({
       userId: createUser.id.toString(),
@@ -76,7 +79,7 @@ describe('Place Order', () => {
 
   it('should not be able to place order to delivered if image is nullable', async () => {
     const createUser = await MakeUser({
-      type: 'admin',
+      role: 'ADMIN',
     })
 
     const createRecipient = await MakeRecipient()
@@ -86,9 +89,9 @@ describe('Place Order', () => {
       recipientId: new UniqueEntityId(createRecipient.id.toString()),
     })
 
-    await userRepository.create(createUser)
-    await recipientRepository.create(createRecipient)
-    await orderRepository.create(createOrder)
+    await inMemoryUsersRepository.create(createUser)
+    await inMemoryRecipientsRepository.create(createRecipient)
+    await inMemoryOrderRepository.create(createOrder)
 
     const result = await sut.execute({
       userId: createUser.id.toString(),
@@ -102,7 +105,7 @@ describe('Place Order', () => {
 
   it('should not be able to  place order if user is different deliveryman user id', async () => {
     const createUser = await MakeUser({
-      type: 'admin',
+      role: 'ADMIN',
     })
 
     const createRecipient = await MakeRecipient()
@@ -112,9 +115,9 @@ describe('Place Order', () => {
       recipientId: new UniqueEntityId(createRecipient.id.toString()),
     })
 
-    await userRepository.create(createUser)
-    await recipientRepository.create(createRecipient)
-    await orderRepository.create(createOrder)
+    await inMemoryUsersRepository.create(createUser)
+    await inMemoryRecipientsRepository.create(createRecipient)
+    await inMemoryOrderRepository.create(createOrder)
 
     const result = await sut.execute({
       userId: createUser.id.toString(),
@@ -129,10 +132,10 @@ describe('Place Order', () => {
 
   it('should not be able to  place order if order not found', async () => {
     const createUser = await MakeUser({
-      type: 'admin',
+      role: 'ADMIN',
     })
 
-    await userRepository.create(createUser)
+    await inMemoryUsersRepository.create(createUser)
 
     const result = await sut.execute({
       userId: createUser.id.toString(),
@@ -159,10 +162,10 @@ describe('Place Order', () => {
 
   it('should not be able to place order if user not is admin', async () => {
     const createUser = await MakeUser({
-      type: 'deliveryman',
+      role: 'DELIVERYMAN',
     })
 
-    await userRepository.create(createUser)
+    await inMemoryUsersRepository.create(createUser)
 
     const result = await sut.execute({
       userId: createUser.id.toString(),

@@ -3,29 +3,29 @@ import { MakeOrder } from 'test/factories/make-order'
 import { InMemoryOrderRepository } from 'test/repositories/in-memory-order-repository'
 import { FetchOrderByDeliverymanUseCase } from './fetch-order-by-deliveryman'
 
-let orderRepository: InMemoryOrderRepository
+let inMemoryOrderRepository: InMemoryOrderRepository
 let sut: FetchOrderByDeliverymanUseCase
 
 describe('Fetch Order By Deliveryman', () => {
   beforeEach(() => {
-    orderRepository = new InMemoryOrderRepository()
-    sut = new FetchOrderByDeliverymanUseCase(orderRepository)
+    inMemoryOrderRepository = new InMemoryOrderRepository()
+    sut = new FetchOrderByDeliverymanUseCase(inMemoryOrderRepository)
   })
 
   it('should be able to fetch order by deliveryman', async () => {
-    await orderRepository.create(
+    await inMemoryOrderRepository.create(
       await MakeOrder({
         deliverymanId: new UniqueEntityId('user-1'),
       }),
     )
 
-    await orderRepository.create(
+    await inMemoryOrderRepository.create(
       await MakeOrder({
         deliverymanId: new UniqueEntityId('user-1'),
       }),
     )
 
-    await orderRepository.create(
+    await inMemoryOrderRepository.create(
       await MakeOrder({
         deliverymanId: new UniqueEntityId('user-1'),
       }),
@@ -41,7 +41,7 @@ describe('Fetch Order By Deliveryman', () => {
 
   it('should be able to fetch pagination orders by deliveryman', async () => {
     for (let i = 0; i <= 22; i++) {
-      await orderRepository.create(
+      await inMemoryOrderRepository.create(
         await MakeOrder({
           deliverymanId: new UniqueEntityId('user-1'),
         }),

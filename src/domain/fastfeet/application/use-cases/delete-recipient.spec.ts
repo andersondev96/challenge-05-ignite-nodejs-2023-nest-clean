@@ -6,32 +6,35 @@ import { InMemoryRecipientRepository } from 'test/repositories/in-memory-recipie
 import { InMemoryUsersRepository } from 'test/repositories/in-memory-users-repository'
 import { DeleteRecipientUseCase } from './delete-recipient'
 
-let usersRepository: InMemoryUsersRepository
-let recipientsRepository: InMemoryRecipientRepository
+let inMemoryUsersRepository: InMemoryUsersRepository
+let inMemoryRecipientsRepository: InMemoryRecipientRepository
 let sut: DeleteRecipientUseCase
 
 describe('Delete Recipient', () => {
   beforeEach(() => {
-    usersRepository = new InMemoryUsersRepository()
-    recipientsRepository = new InMemoryRecipientRepository()
-    sut = new DeleteRecipientUseCase(usersRepository, recipientsRepository)
+    inMemoryUsersRepository = new InMemoryUsersRepository()
+    inMemoryRecipientsRepository = new InMemoryRecipientRepository()
+    sut = new DeleteRecipientUseCase(
+      inMemoryUsersRepository,
+      inMemoryRecipientsRepository,
+    )
   })
 
   it('should be able to delete recipient', async () => {
     const createUser = await MakeUser({
-      type: 'admin',
+      role: 'ADMIN',
     })
     const createRecipient = await MakeRecipient()
 
-    usersRepository.create(createUser)
-    recipientsRepository.create(createRecipient)
+    inMemoryUsersRepository.create(createUser)
+    inMemoryRecipientsRepository.create(createRecipient)
 
     await sut.execute({
       userId: createUser.id.toString(),
       recipientId: createRecipient.id.toString(),
     })
 
-    expect(recipientsRepository.items).toHaveLength(0)
+    expect(inMemoryRecipientsRepository.items).toHaveLength(0)
   })
 
   it('should not be able to delete recipient if user not found', async () => {
@@ -46,10 +49,10 @@ describe('Delete Recipient', () => {
 
   it('should not be able to delete recipient if user not is admin', async () => {
     const createUser = await MakeUser({
-      type: 'deliveryman',
+      role: 'DELIVERYMAN',
     })
 
-    usersRepository.create(createUser)
+    inMemoryUsersRepository.create(createUser)
 
     const result = await sut.execute({
       userId: createUser.id.toString(),
@@ -62,10 +65,10 @@ describe('Delete Recipient', () => {
 
   it('should not be able to delete recipient not found', async () => {
     const createUser = await MakeUser({
-      type: 'admin',
+      role: 'ADMIN',
     })
 
-    usersRepository.create(createUser)
+    inMemoryUsersRepository.create(createUser)
 
     const result = await sut.execute({
       userId: createUser.id.toString(),

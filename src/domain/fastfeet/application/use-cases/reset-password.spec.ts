@@ -1,25 +1,28 @@
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
+import { FakeHash } from 'test/cryptography/fake-hash'
 import { MakeUser } from 'test/factories/make-user'
 import { InMemoryUsersRepository } from 'test/repositories/in-memory-users-repository'
 import { ResetPasswordUseCase } from './reset-password'
 
-let usersRepository: InMemoryUsersRepository
+let inMemoryUsersRepository: InMemoryUsersRepository
+let fakeHash: FakeHash
 let sut: ResetPasswordUseCase
 
 describe('Reset Password', () => {
   beforeEach(() => {
-    usersRepository = new InMemoryUsersRepository()
-    sut = new ResetPasswordUseCase(usersRepository)
+    inMemoryUsersRepository = new InMemoryUsersRepository()
+    fakeHash = new FakeHash()
+    sut = new ResetPasswordUseCase(inMemoryUsersRepository, fakeHash, fakeHash)
   })
 
   it('should be able to reset password', async () => {
     const createUser = await MakeUser({
       cpf: '123.456.789-00',
-      type: 'admin',
+      role: 'ADMIN',
     })
 
-    usersRepository.create(createUser)
+    inMemoryUsersRepository.create(createUser)
 
     const result = await sut.execute({
       userId: createUser.id.toString(),
@@ -48,17 +51,17 @@ describe('Reset Password', () => {
       name: 'User Logged',
       cpf: '111.111.111.111',
       password: '12345678',
-      type: 'deliveryman',
+      role: 'DELIVERYMAN',
     })
 
-    usersRepository.create(userLogged)
+    inMemoryUsersRepository.create(userLogged)
 
     const createUser = await MakeUser({
       cpf: '123.456.789-00',
-      type: 'deliveryman',
+      role: 'DELIVERYMAN',
     })
 
-    usersRepository.create(createUser)
+    inMemoryUsersRepository.create(createUser)
 
     const result = await sut.execute({
       userId: userLogged.id.toString(),
