@@ -19,6 +19,7 @@ describe('Reset Password', () => {
   it('should be able to reset password', async () => {
     const createUser = await MakeUser({
       cpf: '123.456.789-00',
+      password: await fakeHash.hash('123456'),
       role: 'ADMIN',
     })
 
