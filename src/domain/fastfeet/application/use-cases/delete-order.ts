@@ -1,6 +1,7 @@
 import { Either, left, right } from '@/core/either'
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
+import { Injectable } from '@nestjs/common'
 import { Order } from '../../enterprise/entities/Order'
 import { OrdersRepository } from '../repositories/orders-repository'
 import { UsersRepository } from '../repositories/users-repository'
@@ -17,6 +18,7 @@ type DeleteOrderUseCaseResponse = Either<
   }
 >
 
+@Injectable()
 export class DeleteOrderUseCase {
   constructor(
     private usersRepository: UsersRepository,

@@ -1,5 +1,6 @@
 import { Either, left, right } from '@/core/either'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
+import { Injectable } from '@nestjs/common'
 import { UsersRepository } from '../repositories/users-repository'
 
 interface DeleteUserUseCaseRequest {
@@ -8,6 +9,7 @@ interface DeleteUserUseCaseRequest {
 
 type CreteUserUseCaseResponse = Either<ResourceNotFoundError, null>
 
+@Injectable()
 export class DeleteUserUseCase {
   constructor(private userRepository: UsersRepository) {}
 

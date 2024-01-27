@@ -23,6 +23,7 @@ export class PrismaOrderMapper {
 
   static toPrisma(order: Order): Prisma.OrderUncheckedCreateInput {
     return {
+      id: order.id.toString(),
       recipientId: order.recipientId.toString(),
       deliverymanId: order.deliverymanId.toString(),
       product: order.product,

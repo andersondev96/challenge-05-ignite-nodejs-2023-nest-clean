@@ -1,9 +1,9 @@
-import {
-  Order,
-  OrderProps,
-  StatusOrder,
-} from '@/domain/fastfeet/enterprise/entities/Order'
+import { Order, OrderProps } from '@/domain/fastfeet/enterprise/entities/Order'
+import { PrismaOrderMapper } from '@/infra/database/prisma/mappers/prisma-order-mapper'
+import { PrismaService } from '@/infra/database/prisma/prisma.service'
 import { faker } from '@faker-js/faker'
+import { Injectable } from '@nestjs/common'
+import { StatusOrder } from '@prisma/client'
 import { UniqueEntityId } from 'src/core/entities/unique-entity-id'
 
 export async function MakeOrder(
@@ -24,4 +24,19 @@ export async function MakeOrder(
   )
 
   return order
+}
+
+@Injectable()
+export class OrderFactory {
+  constructor(private prisma: PrismaService) {}
+
+  async makePrismaOrder(data: Partial<OrderProps> = {}): Promise<Order> {
+    const order = await MakeOrder(data)
+
+    await this.prisma.order.create({
+      data: PrismaOrderMapper.toPrisma(order),
+    })
+
+    return order
+  }
 }

@@ -2,7 +2,9 @@ import { Either, left, right } from '@/core/either'
 import { UniqueEntityId } from '@/core/entities/unique-entity-id'
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
-import { Order, StatusOrder } from '../../enterprise/entities/Order'
+import { Injectable } from '@nestjs/common'
+import { StatusOrder } from '@prisma/client'
+import { Order } from '../../enterprise/entities/Order'
 import { OrdersRepository } from '../repositories/orders-repository'
 import { RecipientsRepository } from '../repositories/recipients-repository'
 import { UsersRepository } from '../repositories/users-repository'
@@ -22,6 +24,7 @@ type CreateOrderUseCaseResponse = Either<
   }
 >
 
+@Injectable()
 export class CreateOrderUseCase {
   constructor(
     private usersRepository: UsersRepository,
