@@ -1,29 +1,45 @@
-import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
-import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
+import { FakeEncrypter } from 'test/cryptography/fake-encrypter'
+import { FakeHash } from 'test/cryptography/fake-hash'
 import { MakeUser } from 'test/factories/make-user'
 import { InMemoryUsersRepository } from 'test/repositories/in-memory-users-repository'
 import { AuthenticateUseCase } from './authenticate'
+import { WrongCredentialsError } from './errors/WrongCredentialsError'
 
 let inMemoryUsersRepository: InMemoryUsersRepository
+let fakeHash: FakeHash
+let fakeEncrypter: FakeEncrypter
 let sut: AuthenticateUseCase
 
 describe('Authenticate User', () => {
   beforeEach(() => {
     inMemoryUsersRepository = new InMemoryUsersRepository()
-    sut = new AuthenticateUseCase(inMemoryUsersRepository)
+    fakeHash = new FakeHash()
+    fakeEncrypter = new FakeEncrypter()
+
+    sut = new AuthenticateUseCase(
+      inMemoryUsersRepository,
+      fakeHash,
+      fakeEncrypter,
+    )
   })
 
   it('should be able to authenticate an user', async () => {
-    const createUser = await MakeUser()
+    const user = await MakeUser({
+      cpf: '12345678',
+      password: await fakeHash.hash('12345678'),
+    })
 
-    inMemoryUsersRepository.create(createUser)
+    inMemoryUsersRepository.items.push(user)
 
     const result = await sut.execute({
-      cpf: createUser.cpf,
-      password: '123456',
+      cpf: '12345678',
+      password: '12345678',
     })
 
     expect(result.isRight()).toBe(true)
+    expect(result.value).toEqual({
+      accessToken: expect.any(String),
+    })
   })
 
   it('should not be able to authenticate if user not exists', async () => {
@@ -40,7 +56,7 @@ describe('Authenticate User', () => {
     })
 
     expect(result.isLeft()).toBe(true)
-    expect(result.value).toBeInstanceOf(ResourceNotFoundError)
+    expect(result.value).toBeInstanceOf(WrongCredentialsError)
   })
 
   it('should not be able to authenticate if password is incorrect', async () => {
@@ -57,6 +73,6 @@ describe('Authenticate User', () => {
     })
 
     expect(result.isLeft()).toBe(true)
-    expect(result.value).toBeInstanceOf(NotAllowedError)
+    expect(result.value).toBeInstanceOf(WrongCredentialsError)
   })
 })

@@ -5,23 +5,26 @@ import { InMemoryRecipientRepository } from 'test/repositories/in-memory-recipie
 import { InMemoryUsersRepository } from 'test/repositories/in-memory-users-repository'
 import { CreateRecipientUseCase } from './create-recipient'
 
-let usersRepository: InMemoryUsersRepository
-let recipientRepository: InMemoryRecipientRepository
+let inMemoryUsersRepository: InMemoryUsersRepository
+let inMemoryRecipientRepository: InMemoryRecipientRepository
 let sut: CreateRecipientUseCase
 
 describe('Create recipient', () => {
   beforeEach(() => {
-    usersRepository = new InMemoryUsersRepository()
-    recipientRepository = new InMemoryRecipientRepository()
-    sut = new CreateRecipientUseCase(usersRepository, recipientRepository)
+    inMemoryUsersRepository = new InMemoryUsersRepository()
+    inMemoryRecipientRepository = new InMemoryRecipientRepository()
+    sut = new CreateRecipientUseCase(
+      inMemoryUsersRepository,
+      inMemoryRecipientRepository,
+    )
   })
 
   it('should be able to  create a new recipient', async () => {
     const user = await MakeUser({
-      type: 'admin',
+      role: 'ADMIN',
     })
 
-    usersRepository.create(user)
+    inMemoryUsersRepository.create(user)
 
     const result = await sut.execute({
       userId: user.id.toString(),
@@ -30,6 +33,7 @@ describe('Create recipient', () => {
     })
 
     expect(result.isRight()).toEqual(true)
+    expect(inMemoryUsersRepository.items.length).toBe(1)
   })
 
   it('should not be able to  create a new recipient if user not found', async () => {
@@ -45,10 +49,10 @@ describe('Create recipient', () => {
 
   it('should not be able to  create a new recipient if user not is admin', async () => {
     const user = await MakeUser({
-      type: 'deliveryman',
+      role: 'DELIVERYMAN',
     })
 
-    usersRepository.create(user)
+    inMemoryUsersRepository.create(user)
 
     const result = await sut.execute({
       userId: user.id.toString(),

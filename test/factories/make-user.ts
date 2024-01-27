@@ -3,7 +3,6 @@ import { PrismaUserMapper } from '@/infra/database/prisma/mappers/prisma-user-ma
 import { PrismaService } from '@/infra/database/prisma/prisma.service'
 import { faker } from '@faker-js/faker'
 import { Injectable } from '@nestjs/common'
-import { hash } from 'bcryptjs'
 import { UniqueEntityId } from 'src/core/entities/unique-entity-id'
 
 export async function MakeUser(
@@ -12,13 +11,11 @@ export async function MakeUser(
 ) {
   const userType: 'DELIVERYMAN' | 'ADMIN' = 'DELIVERYMAN'
 
-  const hashPassword = await hash('123456', 6)
-
   const user = User.create(
     {
       name: faker.person.firstName(),
       cpf: faker.string.uuid(),
-      password: hashPassword,
+      password: faker.internet.password(),
       role: userType,
       ...override,
     },

@@ -3,9 +3,9 @@ import { UniqueEntityId } from '@/core/entities/unique-entity-id'
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
 import { Order, StatusOrder } from '../../enterprise/entities/Order'
-import { OrderRepository } from '../repositories/order-repository'
-import { RecipientRepository } from '../repositories/recipient-repository'
-import { UserRepository } from '../repositories/user-repository'
+import { OrdersRepository } from '../repositories/orders-repository'
+import { RecipientsRepository } from '../repositories/recipients-repository'
+import { UsersRepository } from '../repositories/users-repository'
 
 interface CreateOrderUseCaseRequest {
   recipientId: string
@@ -24,9 +24,9 @@ type CreateOrderUseCaseResponse = Either<
 
 export class CreateOrderUseCase {
   constructor(
-    private userRepository: UserRepository,
-    private recipientRepository: RecipientRepository,
-    private orderRepository: OrderRepository,
+    private usersRepository: UsersRepository,
+    private recipientsRepository: RecipientsRepository,
+    private ordersRepository: OrdersRepository,
   ) {}
 
   async execute({
@@ -35,17 +35,17 @@ export class CreateOrderUseCase {
     product,
     details,
   }: CreateOrderUseCaseRequest): Promise<CreateOrderUseCaseResponse> {
-    const deliveryman = await this.userRepository.findById(deliverymanId)
+    const deliveryman = await this.usersRepository.findById(deliverymanId)
 
     if (!deliveryman) {
       return left(new ResourceNotFoundError())
     }
 
-    if (deliveryman.type !== 'admin') {
+    if (deliveryman.role !== 'ADMIN') {
       return left(new NotAllowedError())
     }
 
-    const recipient = await this.recipientRepository.findById(recipientId)
+    const recipient = await this.recipientsRepository.findById(recipientId)
 
     if (!recipient) {
       return left(new ResourceNotFoundError())
@@ -60,7 +60,7 @@ export class CreateOrderUseCase {
       createdAt: new Date(),
     })
 
-    await this.orderRepository.create(order)
+    await this.ordersRepository.create(order)
 
     return right({
       order,
