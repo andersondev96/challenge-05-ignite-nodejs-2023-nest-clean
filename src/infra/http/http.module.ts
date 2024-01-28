@@ -5,6 +5,7 @@ import { CreateRecipientUseCase } from '@/domain/fastfeet/application/use-cases/
 import { DeleteOrderUseCase } from '@/domain/fastfeet/application/use-cases/delete-order'
 import { DeleteRecipientUseCase } from '@/domain/fastfeet/application/use-cases/delete-recipient'
 import { DeleteUserUseCase } from '@/domain/fastfeet/application/use-cases/delete-user'
+import { FetchOrderByDeliverymanUseCase } from '@/domain/fastfeet/application/use-cases/fetch-order-by-deliveryman'
 import { Module } from '@nestjs/common'
 import { CryptographyModule } from '../cryptography/cryptography.module'
 import { DatabaseModule } from '../database/database.module'
@@ -15,6 +16,7 @@ import { CreateRecipientController } from './controllers/create-recipient.contro
 import { DeleteOrderController } from './controllers/delete-order.controller'
 import { DeleteRecipientController } from './controllers/delete-recipient.controller'
 import { DeleteUserController } from './controllers/delete-user.controller'
+import { FetchOrderByDeliverymanController } from './controllers/fetch-order-by-deliveryman.controller'
 
 @Module({
   imports: [DatabaseModule, CryptographyModule],
@@ -26,6 +28,7 @@ import { DeleteUserController } from './controllers/delete-user.controller'
     DeleteOrderController,
     DeleteRecipientController,
     DeleteUserController,
+    FetchOrderByDeliverymanController,
   ],
   providers: [
     CreateAccountUseCase,
@@ -35,6 +38,7 @@ import { DeleteUserController } from './controllers/delete-user.controller'
     DeleteOrderUseCase,
     DeleteRecipientUseCase,
     DeleteUserUseCase,
+    FetchOrderByDeliverymanUseCase,
   ],
 })
 export class HttpModule {}

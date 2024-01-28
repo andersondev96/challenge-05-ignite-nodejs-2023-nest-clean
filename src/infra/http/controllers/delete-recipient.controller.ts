@@ -2,11 +2,11 @@ import { DeleteRecipientUseCase } from '@/domain/fastfeet/application/use-cases/
 import { CurrentUser } from '@/infra/auth/current-user-decorator'
 import { UserPayload } from '@/infra/auth/jwt.strategy'
 import {
-    BadRequestException,
-    Controller,
-    Delete,
-    HttpCode,
-    Param,
+  BadRequestException,
+  Controller,
+  Delete,
+  HttpCode,
+  Param,
 } from '@nestjs/common'
 
 @Controller('/recipient/:recipientId')
