@@ -1,5 +1,6 @@
 import { Either, left, right } from '@/core/either'
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
+import { Injectable } from '@nestjs/common'
 import { User } from '../../enterprise/entities/User'
 import { UsersRepository } from '../repositories/users-repository'
 
@@ -14,6 +15,7 @@ type GetProfileUseCaseResponse = Either<
   }
 >
 
+@Injectable()
 export class GetProfileUserUseCase {
   constructor(private usersRepository: UsersRepository) {}
 

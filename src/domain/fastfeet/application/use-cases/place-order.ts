@@ -1,7 +1,9 @@
 import { Either, left, right } from '@/core/either'
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
-import { Order, StatusOrder } from '../../enterprise/entities/Order'
+import { Injectable } from '@nestjs/common'
+import { StatusOrder } from '@prisma/client'
+import { Order } from '../../enterprise/entities/Order'
 import { OrdersRepository } from '../repositories/orders-repository'
 import { UsersRepository } from '../repositories/users-repository'
 
@@ -19,6 +21,7 @@ type PlaceOrderUseCaseResponse = Either<
   }
 >
 
+@Injectable()
 export class PlaceOrderUseCase {
   constructor(
     private usersRepository: UsersRepository,
@@ -55,7 +58,7 @@ export class PlaceOrderUseCase {
       return left(new NotAllowedError())
     }
 
-    order.status = status.toString()
+    order.status = status
 
     if (image) {
       order.image = image

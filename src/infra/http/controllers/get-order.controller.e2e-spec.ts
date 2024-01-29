@@ -5,64 +5,61 @@ import { JwtService } from '@nestjs/jwt'
 import { Test } from '@nestjs/testing'
 import { AppModule } from 'src/infra/app.module'
 import request from 'supertest'
+import { OrderFactory } from 'test/factories/make-order'
 import { RecipientFactory } from 'test/factories/make-recipient'
 import { UserFactory } from 'test/factories/make-user'
 
-describe('Create Order Controller (E2E)', () => {
+describe('Get order controller (E2E)', () => {
   let app: INestApplication
   let prisma: PrismaService
   let userFactory: UserFactory
   let recipientFactory: RecipientFactory
+  let orderFactory: OrderFactory
   let jwt: JwtService
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule, DatabaseModule],
-      providers: [UserFactory, RecipientFactory],
+      providers: [UserFactory, RecipientFactory, OrderFactory],
     }).compile()
 
     app = moduleRef.createNestApplication()
     userFactory = moduleRef.get(UserFactory)
     recipientFactory = moduleRef.get(RecipientFactory)
+    orderFactory = moduleRef.get(OrderFactory)
     prisma = moduleRef.get(PrismaService)
     jwt = moduleRef.get(JwtService)
 
     await app.init()
   })
 
-  test('[POST] / orders/:recipientId', async () => {
+  test('[GET] / orders/:orderId', async () => {
     const user = await userFactory.makePrismaUser({
       role: 'ADMIN',
-    })
-
-    await userFactory.makePrismaUser({
-      role: 'DELIVERYMAN',
     })
 
     const recipient = await recipientFactory.makePrismaRecipient({
       userId: user.id,
     })
 
-    const recipientId = recipient.id
-
-    const accessToken = jwt.sign({ sub: user.id.toString() })
-
-    const response = await request(app.getHttpServer())
-      .post(`/orders/${recipientId}`)
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send({
-        product: 'Product example',
-        details: 'Detail example',
-      })
-
-    expect(response.statusCode).toEqual(201)
-
-    const orderOnDatabase = await prisma.order.findFirst({
-      where: {
-        product: 'Product example',
-      },
+    const order = await orderFactory.makePrismaOrder({
+      deliverymanId: user.id,
+      recipientId: recipient.id,
+      product: 'product 01',
     })
 
-    expect(orderOnDatabase).toBeTruthy()
+    const orderId = order.id
+
+    const response = await request(app.getHttpServer())
+      .get(`/orders/${orderId}`)
+      .send()
+
+    expect(response.statusCode).toEqual(200)
+
+    expect(response.body).toEqual({
+      order: expect.objectContaining({
+        product: 'product 01',
+      }),
+    })
   })
 })

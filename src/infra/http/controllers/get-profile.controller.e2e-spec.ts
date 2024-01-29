@@ -5,64 +5,51 @@ import { JwtService } from '@nestjs/jwt'
 import { Test } from '@nestjs/testing'
 import { AppModule } from 'src/infra/app.module'
 import request from 'supertest'
+import { OrderFactory } from 'test/factories/make-order'
 import { RecipientFactory } from 'test/factories/make-recipient'
 import { UserFactory } from 'test/factories/make-user'
 
-describe('Create Order Controller (E2E)', () => {
+describe('Get profile controller (E2E)', () => {
   let app: INestApplication
   let prisma: PrismaService
   let userFactory: UserFactory
-  let recipientFactory: RecipientFactory
   let jwt: JwtService
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule, DatabaseModule],
-      providers: [UserFactory, RecipientFactory],
+      providers: [UserFactory, RecipientFactory, OrderFactory],
     }).compile()
 
     app = moduleRef.createNestApplication()
     userFactory = moduleRef.get(UserFactory)
-    recipientFactory = moduleRef.get(RecipientFactory)
     prisma = moduleRef.get(PrismaService)
     jwt = moduleRef.get(JwtService)
 
     await app.init()
   })
 
-  test('[POST] / orders/:recipientId', async () => {
+  test('[GET] / profile', async () => {
     const user = await userFactory.makePrismaUser({
-      role: 'ADMIN',
-    })
-
-    await userFactory.makePrismaUser({
+      name: 'John Doe',
       role: 'DELIVERYMAN',
     })
-
-    const recipient = await recipientFactory.makePrismaRecipient({
-      userId: user.id,
-    })
-
-    const recipientId = recipient.id
 
     const accessToken = jwt.sign({ sub: user.id.toString() })
 
     const response = await request(app.getHttpServer())
-      .post(`/orders/${recipientId}`)
+      .get(`/profile`)
       .set('Authorization', `Bearer ${accessToken}`)
-      .send({
-        product: 'Product example',
-        details: 'Detail example',
-      })
+      .send()
 
-    expect(response.statusCode).toEqual(201)
+    expect(response.statusCode).toEqual(200)
 
-    const orderOnDatabase = await prisma.order.findFirst({
+    const userOnDatabase = await prisma.user.findFirst({
       where: {
-        product: 'Product example',
+        name: 'John Doe',
       },
     })
 
-    expect(orderOnDatabase).toBeTruthy()
+    expect(userOnDatabase).toBeTruthy()
   })
 })
