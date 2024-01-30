@@ -1,6 +1,7 @@
 import { Either, left, right } from '@/core/either'
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
+import { Injectable } from '@nestjs/common'
 import { User } from '../../enterprise/entities/User'
 import { HashComparer } from '../cryptography/hash-comparer'
 import { HashGenerator } from '../cryptography/hash-generator'
@@ -20,6 +21,7 @@ type ResetPasswordUseCaseResponse = Either<
   }
 >
 
+@Injectable()
 export class ResetPasswordUseCase {
   constructor(
     private userRepository: UsersRepository,
