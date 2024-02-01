@@ -1,4 +1,5 @@
 import { Either, left, right } from '@/core/either'
+import { Injectable } from '@nestjs/common'
 import { User } from '../../enterprise/entities/User'
 import { HashGenerator } from '../cryptography/hash-generator'
 import { UsersRepository } from '../repositories/users-repository'
@@ -18,6 +19,7 @@ type UpdateUserUseCaseResponse = Either<
   }
 >
 
+@Injectable()
 export class UpdateUserUseCase {
   constructor(
     private usersRepository: UsersRepository,

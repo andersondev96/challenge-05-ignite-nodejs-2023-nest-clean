@@ -1,6 +1,7 @@
 import { Either, left, right } from '@/core/either'
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
+import { Injectable } from '@nestjs/common'
 import { Recipient } from '../../enterprise/entities/Recipient'
 import { RecipientsRepository } from '../repositories/recipients-repository'
 import { UsersRepository } from '../repositories/users-repository'
@@ -19,6 +20,7 @@ type CreteUserUseCaseResponse = Either<
   }
 >
 
+@Injectable()
 export class UpdateRecipientUseCase {
   constructor(
     private userRepository: UsersRepository,

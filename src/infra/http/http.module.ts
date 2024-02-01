@@ -11,6 +11,9 @@ import { GetProfileUserUseCase } from '@/domain/fastfeet/application/use-cases/g
 import { GetRecipientUseCase } from '@/domain/fastfeet/application/use-cases/get-recipient'
 import { PlaceOrderUseCase } from '@/domain/fastfeet/application/use-cases/place-order'
 import { ResetPasswordUseCase } from '@/domain/fastfeet/application/use-cases/reset-password'
+import { UpdateOrderUseCase } from '@/domain/fastfeet/application/use-cases/update-order'
+import { UpdateRecipientUseCase } from '@/domain/fastfeet/application/use-cases/update-recipient'
+import { UpdateUserUseCase } from '@/domain/fastfeet/application/use-cases/update-user'
 import { Module } from '@nestjs/common'
 import { CryptographyModule } from '../cryptography/cryptography.module'
 import { DatabaseModule } from '../database/database.module'
@@ -27,6 +30,9 @@ import { GetProfileController } from './controllers/get-profile.controller'
 import { GetRecipientController } from './controllers/get-recipient.controller'
 import { PlaceOrderController } from './controllers/place-order.controller'
 import { ResetPasswordController } from './controllers/reset-password.controller'
+import { UpdateOrderController } from './controllers/update-order.controller'
+import { UpdateRecipientController } from './controllers/update-recipient.controller'
+import { UpdateUserController } from './controllers/update-user.controller'
 
 @Module({
   imports: [DatabaseModule, CryptographyModule],
@@ -44,6 +50,9 @@ import { ResetPasswordController } from './controllers/reset-password.controller
     GetRecipientController,
     PlaceOrderController,
     ResetPasswordController,
+    UpdateOrderController,
+    UpdateRecipientController,
+    UpdateUserController,
   ],
   providers: [
     CreateAccountUseCase,
@@ -59,6 +68,9 @@ import { ResetPasswordController } from './controllers/reset-password.controller
     GetRecipientUseCase,
     PlaceOrderUseCase,
     ResetPasswordUseCase,
+    UpdateOrderUseCase,
+    UpdateRecipientUseCase,
+    UpdateUserUseCase,
   ],
 })
 export class HttpModule {}

@@ -14,7 +14,7 @@ describe('Get Order', () => {
   beforeEach(() => {
     inMemoryUsersRepository = new InMemoryUsersRepository()
     inMemoryOrderRepository = new InMemoryOrderRepository()
-    sut = new GetOrderUseCase(inMemoryUsersRepository, inMemoryOrderRepository)
+    sut = new GetOrderUseCase(inMemoryOrderRepository)
   })
 
   it('should be able to get order', async () => {
@@ -28,7 +28,6 @@ describe('Get Order', () => {
     await inMemoryOrderRepository.create(createOrder)
 
     const result = await sut.execute({
-      userId: createUser.id.toString(),
       orderId: createOrder.id.toString(),
     })
 
@@ -41,7 +40,6 @@ describe('Get Order', () => {
     await inMemoryOrderRepository.create(createOrder)
 
     const result = await sut.execute({
-      userId: '123456',
       orderId: createOrder.id.toString(),
     })
 
@@ -59,7 +57,6 @@ describe('Get Order', () => {
     await inMemoryOrderRepository.create(createOrder)
 
     const result = await sut.execute({
-      userId: createUser.id.toString(),
       orderId: createOrder.id.toString(),
     })
 

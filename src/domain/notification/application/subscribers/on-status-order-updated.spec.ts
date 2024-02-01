@@ -1,5 +1,5 @@
 import { UniqueEntityId } from '@/core/entities/unique-entity-id'
-import { StatusOrder } from '@/domain/fastfeet/enterprise/entities/Order'
+import { StatusOrder } from '@prisma/client'
 import { MakeOrder } from 'test/factories/make-order'
 import { MakeRecipient } from 'test/factories/make-recipient'
 import { MakeUser } from 'test/factories/make-user'
@@ -50,7 +50,7 @@ describe('On Status Order Updated', () => {
 
     await orderRepository.create(createOrder)
 
-    createOrder.status = StatusOrder.DELIVERED.toString()
+    createOrder.status = StatusOrder.DELIVERED
 
     await orderRepository.save(createOrder)
 
