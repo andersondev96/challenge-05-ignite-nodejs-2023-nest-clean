@@ -1,18 +1,24 @@
 import { PaginationParams } from '@/core/repositories/pagination-params'
 import { OrdersRepository } from '@/domain/fastfeet/application/repositories/orders-repository'
 import { Order } from '@/domain/fastfeet/enterprise/entities/Order'
+import { OrderWithDeliverymanAndRecipient } from '@/domain/fastfeet/enterprise/entities/value-objects/order-with-deliveryman-and-recipient'
 import { Injectable } from '@nestjs/common'
 import { PrismaOrderMapper } from '../mappers/prisma-order-mapper'
+import { PrismaOrderWithDeliverymanAndRecipientMapper } from '../mappers/prisma-order-with-deliveryman-and-recipient-mapper'
 import { PrismaService } from '../prisma.service'
 
 @Injectable()
 export class PrismaOrdersRepository implements OrdersRepository {
   constructor(private prisma: PrismaService) {}
 
-  async findById(id: string): Promise<Order | null> {
+  async findById(id: string): Promise<OrderWithDeliverymanAndRecipient | null> {
     const order = await this.prisma.order.findUnique({
       where: {
         id,
+      },
+      include: {
+        deliveryman: true,
+        recipient: true,
       },
     })
 
@@ -20,22 +26,26 @@ export class PrismaOrdersRepository implements OrdersRepository {
       return null
     }
 
-    return PrismaOrderMapper.toDomain(order)
+    return PrismaOrderWithDeliverymanAndRecipientMapper.toDomain(order)
   }
 
   async findManyByUserId(
     userId: string,
     { page }: PaginationParams,
-  ): Promise<Order[]> {
+  ): Promise<OrderWithDeliverymanAndRecipient[]> {
     const orders = await this.prisma.order.findMany({
       where: {
         deliverymanId: userId,
+      },
+      include: {
+        deliveryman: true,
+        recipient: true,
       },
       take: 20,
       skip: (page - 1) * 20,
     })
 
-    return orders.map(PrismaOrderMapper.toDomain)
+    return orders.map(PrismaOrderWithDeliverymanAndRecipientMapper.toDomain)
   }
 
   async create(order: Order): Promise<void> {
