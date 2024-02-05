@@ -7,8 +7,6 @@ export interface RecipientWithUserProps {
   nameUser: string
   cpf: string
   address: string
-  createdAt: Date
-  updatedAt?: Date | null
 }
 
 export class RecipientWithUser extends ValueObject<RecipientWithUserProps> {
@@ -30,14 +28,6 @@ export class RecipientWithUser extends ValueObject<RecipientWithUserProps> {
 
   get address() {
     return this.props.address
-  }
-
-  get createdAt() {
-    return this.props.createdAt
-  }
-
-  get updatedAt() {
-    return this.props.updatedAt
   }
 
   static create(props: RecipientWithUserProps) {

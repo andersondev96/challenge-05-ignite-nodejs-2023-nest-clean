@@ -13,8 +13,6 @@ export interface OrderWithDeliverymanAndRecipientProps {
   withdrawnDate?: Date | null
   deliveryDate?: Date | null
   image?: string | null
-  createdAt: Date
-  updatedAt?: Date | null
 }
 
 export class OrderWithDeliverymanAndRecipient extends ValueObject<OrderWithDeliverymanAndRecipientProps> {
@@ -56,14 +54,6 @@ export class OrderWithDeliverymanAndRecipient extends ValueObject<OrderWithDeliv
 
   get image() {
     return this.props.image
-  }
-
-  get createdAt() {
-    return this.props.createdAt
-  }
-
-  get updatedAt() {
-    return this.props.updatedAt
   }
 
   static create(props: OrderWithDeliverymanAndRecipientProps) {

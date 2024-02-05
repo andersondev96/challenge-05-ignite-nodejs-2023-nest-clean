@@ -13,7 +13,9 @@ let sut: UpdateRecipientUseCase
 describe('Update Recipient', () => {
   beforeEach(() => {
     inMemoryUsersRepository = new InMemoryUsersRepository()
-    inMemoryRecipientsRepository = new InMemoryRecipientRepository()
+    inMemoryRecipientsRepository = new InMemoryRecipientRepository(
+      inMemoryUsersRepository,
+    )
     sut = new UpdateRecipientUseCase(
       inMemoryUsersRepository,
       inMemoryRecipientsRepository,

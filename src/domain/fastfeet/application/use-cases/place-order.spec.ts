@@ -18,8 +18,13 @@ let sut: PlaceOrderUseCase
 describe('Place Order', () => {
   beforeEach(() => {
     inMemoryUsersRepository = new InMemoryUsersRepository()
-    inMemoryRecipientsRepository = new InMemoryRecipientRepository()
-    inMemoryOrderRepository = new InMemoryOrderRepository()
+    inMemoryRecipientsRepository = new InMemoryRecipientRepository(
+      inMemoryUsersRepository,
+    )
+    inMemoryOrderRepository = new InMemoryOrderRepository(
+      inMemoryUsersRepository,
+      inMemoryRecipientsRepository,
+    )
     sut = new PlaceOrderUseCase(
       inMemoryUsersRepository,
       inMemoryOrderRepository,

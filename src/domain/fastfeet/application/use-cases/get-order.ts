@@ -2,7 +2,7 @@ import { Either, left, right } from '@/core/either'
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
 import { Injectable } from '@nestjs/common'
-import { Order } from '../../enterprise/entities/Order'
+import { OrderWithDeliverymanAndRecipient } from '../../enterprise/entities/value-objects/order-with-deliveryman-and-recipient'
 import { OrdersRepository } from '../repositories/orders-repository'
 
 interface GetOrderUseCaseRequest {
@@ -12,7 +12,7 @@ interface GetOrderUseCaseRequest {
 type GetOrderUseCaseResponse = Either<
   ResourceNotFoundError | NotAllowedError,
   {
-    order: Order
+    order: OrderWithDeliverymanAndRecipient
   }
 >
 

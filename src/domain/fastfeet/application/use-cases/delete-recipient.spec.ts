@@ -13,7 +13,9 @@ let sut: DeleteRecipientUseCase
 describe('Delete Recipient', () => {
   beforeEach(() => {
     inMemoryUsersRepository = new InMemoryUsersRepository()
-    inMemoryRecipientsRepository = new InMemoryRecipientRepository()
+    inMemoryRecipientsRepository = new InMemoryRecipientRepository(
+      inMemoryUsersRepository,
+    )
     sut = new DeleteRecipientUseCase(
       inMemoryUsersRepository,
       inMemoryRecipientsRepository,

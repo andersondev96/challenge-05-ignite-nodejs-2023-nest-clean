@@ -2,9 +2,17 @@ import { DomainEvents } from '@/core/events/domain-events'
 import { PaginationParams } from '@/core/repositories/pagination-params'
 import { OrdersRepository } from '@/domain/fastfeet/application/repositories/orders-repository'
 import { Order } from '@/domain/fastfeet/enterprise/entities/Order'
+import { OrderWithDeliverymanAndRecipient } from '@/domain/fastfeet/enterprise/entities/value-objects/order-with-deliveryman-and-recipient'
+import { InMemoryRecipientRepository } from './in-memory-recipient-repository'
+import { InMemoryUsersRepository } from './in-memory-users-repository'
 
 export class InMemoryOrderRepository implements OrdersRepository {
   public items: Order[] = []
+
+  constructor(
+    private usersRepository: InMemoryUsersRepository,
+    private recipientsRepository: InMemoryRecipientRepository,
+  ) {}
 
   async findById(id: string) {
     const order = this.items.find((item) => item.id.toString() === id)
@@ -13,18 +21,76 @@ export class InMemoryOrderRepository implements OrdersRepository {
       return null
     }
 
-    return order
+    const recipient = this.recipientsRepository.items.find((recipient) =>
+      recipient.id.equals(order.recipientId),
+    )
+
+    if (!recipient) {
+      throw new Error(`
+      Recipient with ID "${order.recipientId.toString()}" does not exist`)
+    }
+
+    const deliveryman = this.usersRepository.items.find((deliveryman) =>
+      deliveryman.id.equals(order.deliverymanId),
+    )
+
+    if (!deliveryman) {
+      throw new Error(`
+      Deliveryman with ID "${order.deliverymanId.toString()}" does not exist`)
+    }
+
+    return OrderWithDeliverymanAndRecipient.create({
+      recipientId: order.recipientId,
+      recipientName: recipient.name,
+      deliverymanId: deliveryman.id,
+      deliverymanName: deliveryman.name,
+      product: order.product,
+      details: order.details,
+      status: order.status,
+      withdrawnDate: order.withdrawDate,
+      deliveryDate: order.deliveryDate,
+      image: order.image,
+    })
   }
 
-  async findManyByUserId(
-    userId: string,
-    { page }: PaginationParams,
-  ): Promise<Order[]> {
-    const orders = this.items
+  async findManyByUserId(userId: string, { page }: PaginationParams) {
+    const ordersWithDeliverymanAndRecipient = this.items
       .filter((item) => item.deliverymanId.toString() === userId)
       .slice((page - 1) * 20, page * 20)
+      .map((order) => {
+        const recipient = this.recipientsRepository.items.find((recipient) => {
+          return recipient.id.equals(order.recipientId)
+        })
 
-    return orders
+        const deliveryman = this.usersRepository.items.find((deliveryman) => {
+          return deliveryman.id.equals(order.deliverymanId)
+        })
+
+        if (!deliveryman) {
+          throw new Error(`
+          Deliveryman with ID "${order.deliverymanId.toString()}" does not exist`)
+        }
+
+        if (!recipient) {
+          throw new Error(`
+          Recipient with ID "${order.recipientId.toString()}" does not exist`)
+        }
+
+        return OrderWithDeliverymanAndRecipient.create({
+          recipientId: order.recipientId,
+          recipientName: recipient.name,
+          deliverymanId: deliveryman.id,
+          deliverymanName: deliveryman.name,
+          product: order.product,
+          details: order.details,
+          status: order.status,
+          withdrawnDate: order.withdrawDate,
+          deliveryDate: order.deliveryDate,
+          image: order.image,
+        })
+      })
+
+    return ordersWithDeliverymanAndRecipient
   }
 
   async create(order: Order) {

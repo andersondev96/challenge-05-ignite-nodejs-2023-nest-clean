@@ -5,17 +5,25 @@ import { MakeOrder } from 'test/factories/make-order'
 import { MakeRecipient } from 'test/factories/make-recipient'
 import { MakeUser } from 'test/factories/make-user'
 import { InMemoryOrderRepository } from 'test/repositories/in-memory-order-repository'
+import { InMemoryRecipientRepository } from 'test/repositories/in-memory-recipient-repository'
 import { InMemoryUsersRepository } from 'test/repositories/in-memory-users-repository'
 import { DeleteOrderUseCase } from './delete-order'
 
 let inMemoryUsersRepository: InMemoryUsersRepository
+let inMemoryRecipientsRepository: InMemoryRecipientRepository
 let inMemoryOrderRepository: InMemoryOrderRepository
 let sut: DeleteOrderUseCase
 
 describe('Delete Order', () => {
   beforeEach(() => {
     inMemoryUsersRepository = new InMemoryUsersRepository()
-    inMemoryOrderRepository = new InMemoryOrderRepository()
+    inMemoryRecipientsRepository = new InMemoryRecipientRepository(
+      inMemoryUsersRepository,
+    )
+    inMemoryOrderRepository = new InMemoryOrderRepository(
+      inMemoryUsersRepository,
+      inMemoryRecipientsRepository,
+    )
     sut = new DeleteOrderUseCase(
       inMemoryUsersRepository,
       inMemoryOrderRepository,

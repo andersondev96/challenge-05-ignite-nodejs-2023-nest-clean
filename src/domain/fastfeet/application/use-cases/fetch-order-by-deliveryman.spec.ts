@@ -1,14 +1,27 @@
 import { UniqueEntityId } from '@/core/entities/unique-entity-id'
 import { MakeOrder } from 'test/factories/make-order'
 import { InMemoryOrderRepository } from 'test/repositories/in-memory-order-repository'
+import { InMemoryRecipientRepository } from 'test/repositories/in-memory-recipient-repository'
+import { InMemoryUsersRepository } from 'test/repositories/in-memory-users-repository'
 import { FetchOrderByDeliverymanUseCase } from './fetch-order-by-deliveryman'
 
+let inMemoryUsersRepository: InMemoryUsersRepository
+let inMemoryRecipientRepository: InMemoryRecipientRepository
 let inMemoryOrderRepository: InMemoryOrderRepository
 let sut: FetchOrderByDeliverymanUseCase
 
 describe('Fetch Order By Deliveryman', () => {
   beforeEach(() => {
-    inMemoryOrderRepository = new InMemoryOrderRepository()
+    beforeEach(() => {
+      inMemoryUsersRepository = new InMemoryUsersRepository()
+      inMemoryRecipientRepository = new InMemoryRecipientRepository(
+        inMemoryUsersRepository,
+      )
+      inMemoryOrderRepository = new InMemoryOrderRepository(
+        inMemoryUsersRepository,
+        inMemoryRecipientRepository,
+      )
+    })
     sut = new FetchOrderByDeliverymanUseCase(inMemoryOrderRepository)
   })
 

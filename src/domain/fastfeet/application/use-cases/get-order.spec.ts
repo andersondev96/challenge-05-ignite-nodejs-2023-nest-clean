@@ -3,17 +3,25 @@ import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
 import { MakeOrder } from 'test/factories/make-order'
 import { MakeUser } from 'test/factories/make-user'
 import { InMemoryOrderRepository } from 'test/repositories/in-memory-order-repository'
+import { InMemoryRecipientRepository } from 'test/repositories/in-memory-recipient-repository'
 import { InMemoryUsersRepository } from 'test/repositories/in-memory-users-repository'
 import { GetOrderUseCase } from './get-order'
 
 let inMemoryUsersRepository: InMemoryUsersRepository
+let inMemoryRecipientsRepository: InMemoryRecipientRepository
 let inMemoryOrderRepository: InMemoryOrderRepository
 let sut: GetOrderUseCase
 
 describe('Get Order', () => {
   beforeEach(() => {
     inMemoryUsersRepository = new InMemoryUsersRepository()
-    inMemoryOrderRepository = new InMemoryOrderRepository()
+    inMemoryRecipientsRepository = new InMemoryRecipientRepository(
+      inMemoryUsersRepository,
+    )
+    inMemoryOrderRepository = new InMemoryOrderRepository(
+      inMemoryUsersRepository,
+      inMemoryRecipientsRepository,
+    )
     sut = new GetOrderUseCase(inMemoryOrderRepository)
   })
 

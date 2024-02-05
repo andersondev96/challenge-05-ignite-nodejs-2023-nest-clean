@@ -17,8 +17,6 @@ export class PrismaRecipientWithUserMapper {
       nameUser: raw.user.name,
       cpf: raw.user.cpf,
       address: raw.address,
-      createdAt: raw.createdAt,
-      updatedAt: raw.updateAt,
     })
   }
 }

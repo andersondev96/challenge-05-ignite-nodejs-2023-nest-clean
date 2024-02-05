@@ -12,7 +12,9 @@ let sut: CreateRecipientUseCase
 describe('Create recipient', () => {
   beforeEach(() => {
     inMemoryUsersRepository = new InMemoryUsersRepository()
-    inMemoryRecipientRepository = new InMemoryRecipientRepository()
+    inMemoryRecipientRepository = new InMemoryRecipientRepository(
+      inMemoryUsersRepository,
+    )
     sut = new CreateRecipientUseCase(
       inMemoryUsersRepository,
       inMemoryRecipientRepository,
