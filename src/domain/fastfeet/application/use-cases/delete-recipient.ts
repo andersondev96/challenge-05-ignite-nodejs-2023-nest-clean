@@ -10,10 +10,7 @@ interface DeleteRecipientUseCaseRequest {
   recipientId: string
 }
 
-type CreteUserUseCaseResponse = Either<
-  ResourceNotFoundError | NotAllowedError,
-  null
->
+type DeleteUserUseCase = Either<ResourceNotFoundError | NotAllowedError, null>
 
 @Injectable()
 export class DeleteRecipientUseCase {
@@ -25,7 +22,7 @@ export class DeleteRecipientUseCase {
   async execute({
     userId,
     recipientId,
-  }: DeleteRecipientUseCaseRequest): Promise<CreteUserUseCaseResponse> {
+  }: DeleteRecipientUseCaseRequest): Promise<DeleteUserUseCase> {
     const user = await this.userRepository.findById(userId)
 
     if (!user) {

@@ -1,7 +1,8 @@
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
 import { GetOrderUseCase } from '@/domain/fastfeet/application/use-cases/get-order'
-import { Public } from '@/infra/auth/public'
+import { CurrentUser } from '@/infra/auth/current-user-decorator'
+import { UserPayload } from '@/infra/auth/jwt.strategy'
 import {
   BadRequestException,
   ConflictException,
@@ -12,13 +13,18 @@ import {
 import { OrderPresenter } from '../presenters/order-presenter'
 
 @Controller('/orders/:orderId')
-@Public()
 export class GetOrderController {
   constructor(private getOrder: GetOrderUseCase) {}
 
   @Get()
-  async handle(@Param('orderId') orderId: string) {
+  async handle(
+    @CurrentUser() user: UserPayload,
+    @Param('orderId') orderId: string,
+  ) {
+    const userId = user.sub
+
     const result = await this.getOrder.execute({
+      userId,
       orderId,
     })
 

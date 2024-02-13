@@ -18,6 +18,10 @@ export class RecipientWithUser extends ValueObject<RecipientWithUserProps> {
     return this.props.name
   }
 
+  set name(name: string) {
+    this.props.name = name
+  }
+
   get nameUser() {
     return this.props.nameUser
   }
@@ -28,6 +32,10 @@ export class RecipientWithUser extends ValueObject<RecipientWithUserProps> {
 
   get address() {
     return this.props.address
+  }
+
+  set address(address: string) {
+    this.props.address = address
   }
 
   static create(props: RecipientWithUserProps) {

@@ -2,27 +2,44 @@ import { Either, left, right } from '@/core/either'
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found'
 import { Injectable } from '@nestjs/common'
-import { OrderWithDeliverymanAndRecipient } from '../../enterprise/entities/value-objects/order-with-deliveryman-and-recipient'
+import { Order } from '../../enterprise/entities/Order'
 import { OrdersRepository } from '../repositories/orders-repository'
+import { UsersRepository } from '../repositories/users-repository'
+import { UserNotFoundError } from './errors/UserNotFoundError'
 
 interface GetOrderUseCaseRequest {
+  userId: string
   orderId: string
 }
 
 type GetOrderUseCaseResponse = Either<
-  ResourceNotFoundError | NotAllowedError,
+  UserNotFoundError | ResourceNotFoundError | NotAllowedError,
   {
-    order: OrderWithDeliverymanAndRecipient
+    order: Order
   }
 >
 
 @Injectable()
 export class GetOrderUseCase {
-  constructor(private ordersRepository: OrdersRepository) {}
+  constructor(
+    private usersRepository: UsersRepository,
+    private ordersRepository: OrdersRepository,
+  ) {}
 
   async execute({
+    userId,
     orderId,
   }: GetOrderUseCaseRequest): Promise<GetOrderUseCaseResponse> {
+    const user = await this.usersRepository.findById(userId)
+
+    if (!user) {
+      return left(new UserNotFoundError())
+    }
+
+    if (user.role !== 'ADMIN') {
+      return left(new NotAllowedError())
+    }
+
     const order = await this.ordersRepository.findById(orderId)
 
     if (!order) {

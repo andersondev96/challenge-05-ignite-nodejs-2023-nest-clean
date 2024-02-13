@@ -3,9 +3,7 @@ import { Order } from '../../enterprise/entities/Order'
 import { OrderWithDeliverymanAndRecipient } from '../../enterprise/entities/value-objects/order-with-deliveryman-and-recipient'
 
 export abstract class OrdersRepository {
-  abstract findById(
-    id: string,
-  ): Promise<OrderWithDeliverymanAndRecipient | null>
+  abstract findById(id: string): Promise<Order | null>
 
   abstract findManyByUserId(
     userId: string,

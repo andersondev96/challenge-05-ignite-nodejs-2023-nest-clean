@@ -1,7 +1,5 @@
 import { DatabaseModule } from '@/infra/database/database.module'
-import { PrismaService } from '@/infra/database/prisma/prisma.service'
 import { INestApplication } from '@nestjs/common'
-import { JwtService } from '@nestjs/jwt'
 import { Test } from '@nestjs/testing'
 import { AppModule } from 'src/infra/app.module'
 import request from 'supertest'
@@ -11,11 +9,9 @@ import { UserFactory } from 'test/factories/make-user'
 
 describe('Fetch order by deliveryman controller (E2E)', () => {
   let app: INestApplication
-  let prisma: PrismaService
   let userFactory: UserFactory
   let recipientFactory: RecipientFactory
   let orderFactory: OrderFactory
-  let jwt: JwtService
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -27,8 +23,6 @@ describe('Fetch order by deliveryman controller (E2E)', () => {
     userFactory = moduleRef.get(UserFactory)
     recipientFactory = moduleRef.get(RecipientFactory)
     orderFactory = moduleRef.get(OrderFactory)
-    prisma = moduleRef.get(PrismaService)
-    jwt = moduleRef.get(JwtService)
 
     await app.init()
   })

@@ -11,7 +11,7 @@ import {
   Query,
 } from '@nestjs/common'
 import { z } from 'zod'
-import { OrderPresenter } from '../presenters/order-presenter'
+import { OrderWithDeliverymanAndRecipientPresenter } from '../presenters/order-with-deliveryman-and-recipient-presenter'
 
 const pageQueryParamsSchema = z
   .string()
@@ -48,6 +48,8 @@ export class FetchOrderByDeliverymanController {
 
     const orders = result.value.orders
 
-    return { orders: orders.map(OrderPresenter.toHTTP) }
+    return {
+      orders: orders.map(OrderWithDeliverymanAndRecipientPresenter.toHTTP),
+    }
   }
 }

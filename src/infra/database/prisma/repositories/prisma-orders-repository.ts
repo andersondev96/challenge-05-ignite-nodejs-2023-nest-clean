@@ -11,7 +11,7 @@ import { PrismaService } from '../prisma.service'
 export class PrismaOrdersRepository implements OrdersRepository {
   constructor(private prisma: PrismaService) {}
 
-  async findById(id: string): Promise<OrderWithDeliverymanAndRecipient | null> {
+  async findById(id: string): Promise<Order | null> {
     const order = await this.prisma.order.findUnique({
       where: {
         id,
@@ -26,7 +26,7 @@ export class PrismaOrdersRepository implements OrdersRepository {
       return null
     }
 
-    return PrismaOrderWithDeliverymanAndRecipientMapper.toDomain(order)
+    return PrismaOrderMapper.toDomain(order)
   }
 
   async findManyByUserId(

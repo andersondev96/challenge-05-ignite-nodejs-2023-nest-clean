@@ -11,7 +11,7 @@ interface GetRecipientUseCaseRequest {
   recipientId: string
 }
 
-type CreteUserUseCaseResponse = Either<
+type GetRecipientUseCaseResponse = Either<
   ResourceNotFoundError | NotAllowedError,
   {
     recipient: Recipient
@@ -28,7 +28,7 @@ export class GetRecipientUseCase {
   async execute({
     userId,
     recipientId,
-  }: GetRecipientUseCaseRequest): Promise<CreteUserUseCaseResponse> {
+  }: GetRecipientUseCaseRequest): Promise<GetRecipientUseCaseResponse> {
     const user = await this.userRepository.findById(userId)
 
     if (!user) {

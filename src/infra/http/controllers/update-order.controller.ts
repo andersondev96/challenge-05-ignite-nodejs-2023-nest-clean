@@ -3,12 +3,12 @@ import { CurrentUser } from '@/infra/auth/current-user-decorator'
 import { UserPayload } from '@/infra/auth/jwt.strategy'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation-pipe'
 import {
-    BadRequestException,
-    Body,
-    Controller,
-    HttpCode,
-    Param,
-    Put,
+  BadRequestException,
+  Body,
+  Controller,
+  HttpCode,
+  Param,
+  Put,
 } from '@nestjs/common'
 import { z } from 'zod'
 

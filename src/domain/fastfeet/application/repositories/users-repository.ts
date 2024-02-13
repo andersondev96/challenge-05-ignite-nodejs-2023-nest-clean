@@ -1,4 +1,4 @@
-import { User } from '@/domain/fastfeet/enterprise/entities/User';
+import { User } from '@/domain/fastfeet/enterprise/entities/User'
 
 export abstract class UsersRepository {
   abstract findById(id: string): Promise<User | null>

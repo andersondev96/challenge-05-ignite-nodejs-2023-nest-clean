@@ -26,8 +26,6 @@ export class PrismaOrderWithDeliverymanAndRecipientMapper {
       withdrawnDate: raw.withdrawnDate,
       deliveryDate: raw.deliveryDate,
       image: raw.image,
-      updatedAt: raw.updatedAt,
-      createdAt: raw.createdAt,
     })
   }
 }

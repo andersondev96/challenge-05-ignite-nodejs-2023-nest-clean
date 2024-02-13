@@ -38,6 +38,8 @@ describe('Get order controller (E2E)', () => {
       role: 'ADMIN',
     })
 
+    const accessToken = jwt.sign({ sub: user.id.toString() })
+
     const recipient = await recipientFactory.makePrismaRecipient({
       userId: user.id,
     })
@@ -52,6 +54,7 @@ describe('Get order controller (E2E)', () => {
 
     const response = await request(app.getHttpServer())
       .get(`/orders/${orderId}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .send()
 
     expect(response.statusCode).toEqual(200)
@@ -61,5 +64,13 @@ describe('Get order controller (E2E)', () => {
         product: 'product 01',
       }),
     })
+
+    const orderOnDatabase = await prisma.order.findFirst({
+      where: {
+        product: 'product 01',
+      },
+    })
+
+    expect(orderOnDatabase).toBeTruthy()
   })
 })

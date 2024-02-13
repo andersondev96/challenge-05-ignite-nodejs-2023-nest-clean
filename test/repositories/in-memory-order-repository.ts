@@ -21,36 +21,7 @@ export class InMemoryOrderRepository implements OrdersRepository {
       return null
     }
 
-    const recipient = this.recipientsRepository.items.find((recipient) =>
-      recipient.id.equals(order.recipientId),
-    )
-
-    if (!recipient) {
-      throw new Error(`
-      Recipient with ID "${order.recipientId.toString()}" does not exist`)
-    }
-
-    const deliveryman = this.usersRepository.items.find((deliveryman) =>
-      deliveryman.id.equals(order.deliverymanId),
-    )
-
-    if (!deliveryman) {
-      throw new Error(`
-      Deliveryman with ID "${order.deliverymanId.toString()}" does not exist`)
-    }
-
-    return OrderWithDeliverymanAndRecipient.create({
-      recipientId: order.recipientId,
-      recipientName: recipient.name,
-      deliverymanId: deliveryman.id,
-      deliverymanName: deliveryman.name,
-      product: order.product,
-      details: order.details,
-      status: order.status,
-      withdrawnDate: order.withdrawDate,
-      deliveryDate: order.deliveryDate,
-      image: order.image,
-    })
+    return order
   }
 
   async findManyByUserId(userId: string, { page }: PaginationParams) {

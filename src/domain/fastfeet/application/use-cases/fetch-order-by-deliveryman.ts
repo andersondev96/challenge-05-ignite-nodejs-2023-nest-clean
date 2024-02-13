@@ -1,6 +1,6 @@
 import { Either, right } from '@/core/either'
 import { Injectable } from '@nestjs/common'
-import { Order } from '../../enterprise/entities/Order'
+import { OrderWithDeliverymanAndRecipient } from '../../enterprise/entities/value-objects/order-with-deliveryman-and-recipient'
 import { OrdersRepository } from '../repositories/orders-repository'
 
 interface FetchOrderByDeliverymanUseCaseRequest {
@@ -11,7 +11,7 @@ interface FetchOrderByDeliverymanUseCaseRequest {
 type FetchOrderByDeliverymanUseCaseResponse = Either<
   null,
   {
-    orders: Order[]
+    orders: OrderWithDeliverymanAndRecipient[]
   }
 >
 
