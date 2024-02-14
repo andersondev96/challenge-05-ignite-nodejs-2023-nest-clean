@@ -8,7 +8,7 @@ import { InMemoryOrderRepository } from 'test/repositories/in-memory-order-repos
 import { InMemoryRecipientRepository } from 'test/repositories/in-memory-recipient-repository'
 import { InMemoryUsersRepository } from 'test/repositories/in-memory-users-repository'
 import { waitFor } from 'test/utils/waitFor'
-import { SpyInstance } from 'vitest'
+import { MockInstance } from 'vitest'
 import {
   SendNotificationUseCase,
   SendNotificationUseCaseRequest,
@@ -22,7 +22,7 @@ let inMemoryOrderRepository: InMemoryOrderRepository
 let notificationRepository: InMemoryNotificationsRepository
 let sendNotificationUseCase: SendNotificationUseCase
 
-let sendNotificationExecuteSpyOn: SpyInstance<
+let sendNotificationExecuteSpyOn: MockInstance<
   [SendNotificationUseCaseRequest],
   Promise<SendNotificationUseCaseResponse>
 >
@@ -30,8 +30,13 @@ let sendNotificationExecuteSpyOn: SpyInstance<
 describe('On Status Order Updated', () => {
   beforeEach(() => {
     inMemoryUserRepository = new InMemoryUsersRepository()
-    inMemoryRecipientRepository = new InMemoryRecipientRepository(inMemoryUserRepository)
-    inMemoryOrderRepository = new InMemoryOrderRepository(inMemoryUserRepository, inMemoryRecipientRepository)
+    inMemoryRecipientRepository = new InMemoryRecipientRepository(
+      inMemoryUserRepository,
+    )
+    inMemoryOrderRepository = new InMemoryOrderRepository(
+      inMemoryUserRepository,
+      inMemoryRecipientRepository,
+    )
     notificationRepository = new InMemoryNotificationsRepository()
     sendNotificationUseCase = new SendNotificationUseCase(
       notificationRepository,
@@ -47,7 +52,13 @@ describe('On Status Order Updated', () => {
       role: 'ADMIN',
     })
 
-    const createRecipient = await MakeRecipient()
+    await inMemoryUserRepository.create(createUser)
+
+    const createRecipient = await MakeRecipient({
+      userId: createUser.id,
+    })
+
+    await inMemoryRecipientRepository.create(createRecipient)
 
     const createOrder = await MakeOrder({
       deliverymanId: new UniqueEntityId(createUser.id.toString()),
