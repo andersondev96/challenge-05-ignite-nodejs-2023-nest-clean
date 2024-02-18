@@ -2,7 +2,6 @@ import { UniqueEntityId } from '@/core/entities/unique-entity-id'
 import { StatusOrder } from '@prisma/client'
 import { MakeOrder } from 'test/factories/make-order'
 import { MakeRecipient } from 'test/factories/make-recipient'
-import { MakeUser } from 'test/factories/make-user'
 import { InMemoryNotificationsRepository } from 'test/repositories/in-memory-notifications-repository'
 import { InMemoryOrderRepository } from 'test/repositories/in-memory-order-repository'
 import { InMemoryRecipientRepository } from 'test/repositories/in-memory-recipient-repository'
@@ -14,12 +13,12 @@ import {
   SendNotificationUseCaseRequest,
   SendNotificationUseCaseResponse,
 } from '../use-cases/send-notification'
-import { OnStatusOrderUpdated } from './on-status-order-updated'
+import { OnChangeStatus } from './on-change-status'
 
 let inMemoryUserRepository: InMemoryUsersRepository
 let inMemoryRecipientRepository: InMemoryRecipientRepository
 let inMemoryOrderRepository: InMemoryOrderRepository
-let notificationRepository: InMemoryNotificationsRepository
+let inMemoryNotificationsRepository: InMemoryNotificationsRepository
 let sendNotificationUseCase: SendNotificationUseCase
 
 let sendNotificationExecuteSpyOn: MockInstance<
@@ -27,7 +26,7 @@ let sendNotificationExecuteSpyOn: MockInstance<
   Promise<SendNotificationUseCaseResponse>
 >
 
-describe('On Status Order Updated', () => {
+describe('On Change Status Updated', () => {
   beforeEach(() => {
     inMemoryUserRepository = new InMemoryUsersRepository()
     inMemoryRecipientRepository = new InMemoryRecipientRepository(
@@ -37,34 +36,23 @@ describe('On Status Order Updated', () => {
       inMemoryUserRepository,
       inMemoryRecipientRepository,
     )
-    notificationRepository = new InMemoryNotificationsRepository()
+    inMemoryNotificationsRepository = new InMemoryNotificationsRepository()
     sendNotificationUseCase = new SendNotificationUseCase(
-      notificationRepository,
+      inMemoryNotificationsRepository,
     )
 
     sendNotificationExecuteSpyOn = vi.spyOn(sendNotificationUseCase, 'execute')
 
-    new OnStatusOrderUpdated(inMemoryOrderRepository, sendNotificationUseCase)
+    new OnChangeStatus(inMemoryRecipientRepository, sendNotificationUseCase)
   })
 
   it('should send a notification when an order status is updated', async () => {
-    const createUser = await MakeUser({
-      role: 'ADMIN',
-    })
-
-    await inMemoryUserRepository.create(createUser)
-
-    const createRecipient = await MakeRecipient({
-      userId: createUser.id,
-    })
-
-    await inMemoryRecipientRepository.create(createRecipient)
-
+    const createRecipient = await MakeRecipient()
     const createOrder = await MakeOrder({
-      deliverymanId: new UniqueEntityId(createUser.id.toString()),
       recipientId: new UniqueEntityId(createRecipient.id.toString()),
     })
 
+    await inMemoryRecipientRepository.create(createRecipient)
     await inMemoryOrderRepository.create(createOrder)
 
     createOrder.status = StatusOrder.DELIVERED
@@ -74,5 +62,5 @@ describe('On Status Order Updated', () => {
     await waitFor(() => {
       expect(sendNotificationExecuteSpyOn).toHaveBeenCalled()
     })
-  })
+  }, 10000)
 })

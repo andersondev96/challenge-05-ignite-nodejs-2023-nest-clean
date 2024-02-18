@@ -1,6 +1,6 @@
 import { UniqueEntityId } from '@/core/entities/unique-entity-id'
 import { Order } from '@/domain/fastfeet/enterprise/entities/Order'
-import { Prisma, Order as PrismaOrder } from '@prisma/client'
+import { Prisma, Order as PrismaOrder, StatusOrder } from '@prisma/client'
 
 export class PrismaOrderMapper {
   static toDomain(raw: PrismaOrder): Order {
@@ -10,7 +10,7 @@ export class PrismaOrderMapper {
         deliverymanId: new UniqueEntityId(raw.deliverymanId),
         product: raw.product,
         details: raw.details,
-        status: raw.status,
+        status: raw.status ?? StatusOrder.WAITING,
         withdrawnDate: raw.withdrawnDate,
         deliveryDate: raw.deliveryDate,
         image: raw.image,

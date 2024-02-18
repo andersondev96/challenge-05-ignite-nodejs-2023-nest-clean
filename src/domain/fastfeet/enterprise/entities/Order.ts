@@ -1,13 +1,15 @@
-import { Entity } from '@/core/entities/entity'
+import { AggregateRoot } from '@/core/entities/aggregate-root'
 import { UniqueEntityId } from '@/core/entities/unique-entity-id'
+import { Optional } from '@/core/types/optional'
 import { StatusOrder } from '@prisma/client'
+import { ChangeStatusEvent } from '../events/change-status-event'
 
 export interface OrderProps {
   recipientId: UniqueEntityId
   deliverymanId: UniqueEntityId
   product: string
   details: string
-  status?: StatusOrder | null
+  status: StatusOrder
   withdrawnDate?: Date | null
   deliveryDate?: Date | null
   image?: string | null
@@ -15,7 +17,7 @@ export interface OrderProps {
   updatedAt?: Date | null
 }
 
-export class Order extends Entity<OrderProps> {
+export class Order extends AggregateRoot<OrderProps> {
   get recipientId() {
     return this.props.recipientId
   }
@@ -30,6 +32,7 @@ export class Order extends Entity<OrderProps> {
 
   set product(product: string) {
     this.props.product = product
+    this.touch()
   }
 
   get details() {
@@ -38,36 +41,35 @@ export class Order extends Entity<OrderProps> {
 
   set details(details: string) {
     this.props.details = details
+    this.touch()
   }
 
   get status() {
     return this.props.status
   }
 
-  set status(status: StatusOrder | null | undefined) {
-    this.props.status
-      ? (this.props.status = status)
-      : (this.props.status = null)
+  set status(status: StatusOrder) {
+    this.props.status = status
+    this.touch()
+    this.addDomainEvent(new ChangeStatusEvent(this))
   }
 
   get withdrawDate() {
     return this.props.withdrawnDate
   }
 
-  set withdrawDate(withdrawnDate: Date | null | undefined) {
-    this.props.withdrawnDate
-      ? (this.props.withdrawnDate = withdrawnDate)
-      : (this.props.withdrawnDate = null)
+  set withdrawDate(date: Date | null | undefined) {
+    this.props.withdrawnDate = date
+    this.touch()
   }
 
   get deliveryDate() {
     return this.props.deliveryDate
   }
 
-  set deliveryDate(deliveryDate: Date | null | undefined) {
-    this.props.deliveryDate
-      ? (this.props.withdrawnDate = deliveryDate)
-      : (this.props.withdrawnDate = null)
+  set deliveryDate(date: Date | null | undefined) {
+    this.props.deliveryDate = date
+    this.touch()
   }
 
   get image() {
@@ -86,8 +88,22 @@ export class Order extends Entity<OrderProps> {
     return this.props.updatedAt
   }
 
-  static create(props: OrderProps, id?: UniqueEntityId) {
-    const order = new Order(props, id)
+  private touch() {
+    this.props.updatedAt = new Date()
+  }
+
+  static create(
+    props: Optional<OrderProps, 'createdAt' | 'status'>,
+    id?: UniqueEntityId,
+  ) {
+    const order = new Order(
+      {
+        ...props,
+        status: props.status ?? StatusOrder.WAITING,
+        createdAt: props.createdAt ?? new Date(),
+      },
+      id,
+    )
 
     return order
   }
